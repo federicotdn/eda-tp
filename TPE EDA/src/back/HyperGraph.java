@@ -16,6 +16,8 @@ public class HyperGraph {
     protected List<HyperEdge> hEdges = new LinkedList<HyperEdge>();
     protected List<Node>  nodes = new LinkedList<Node>();
     
+    protected String name;
+    
     private Node start;
     private Node end;
     

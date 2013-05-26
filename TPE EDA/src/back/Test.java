@@ -18,6 +18,11 @@ public class Test
 	    Node g = new Node("G");
 	    Node h = new Node("H");
 	    
+	    hg.nodes.add(e);
+	    hg.nodes.add(f);
+	    hg.nodes.add(g);
+	    hg.nodes.add(h);
+	    
 	   HyperEdge b = new HyperEdge("B", 1, 4.0);
 	   HyperEdge c = new HyperEdge("C", 1, 2.0);
 	   HyperEdge d = new HyperEdge("D", 1, 3.0);
