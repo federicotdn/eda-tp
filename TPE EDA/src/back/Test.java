@@ -20,10 +20,10 @@ public class Test {
 	Node g = new Node("G");
 	Node h = new Node("H");
 
-	hg.nodes.add(e);
-	hg.nodes.add(f);
-	hg.nodes.add(g);
-	hg.nodes.add(h);
+	hg.nodes.put(e.name, e);
+	hg.nodes.put(f.name, f);
+	hg.nodes.put(g.name, g);
+	hg.nodes.put(h.name, h);
 
 	HyperEdge b = new HyperEdge("B", 1, 4.0);
 	HyperEdge c = new HyperEdge("C", 1, 2.0);
@@ -31,11 +31,11 @@ public class Test {
 	HyperEdge i = new HyperEdge("I", 3, 1.0);
 	HyperEdge j = new HyperEdge("J", 2, 8.0);
 
-	hg.hEdges.add(b);
-	hg.hEdges.add(c);
-	hg.hEdges.add(d);
-	hg.hEdges.add(i);
-	hg.hEdges.add(j);
+	hg.hEdges.put(b.name, b);
+	hg.hEdges.put(c.name, c);
+	hg.hEdges.put(d.name, d);
+	hg.hEdges.put(i.name, i);
+	hg.hEdges.put(j.name, j);
 
 	b.tails.add(e);
 	b.tails.add(f);
@@ -65,7 +65,7 @@ public class Test {
 	h.destinationEdges.add(j);
 
 	
-	    GraphSaver.toDOT(hg.exactAlgorithm());
+	    
 	
 	    System.out.println(i.tag);
 

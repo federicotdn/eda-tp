@@ -89,7 +89,7 @@ public class GraphLoader
 					aux = new Node(nodeName);
 					
 					nodes.put(nodeName, aux);			
-					graph.nodes.add(aux);
+					graph.nodes.put(aux.name, aux);
 				}
 				
 				edge.heads.add(aux);
@@ -110,13 +110,13 @@ public class GraphLoader
 					aux = new Node(nodeName);
 					
 					nodes.put(nodeName, aux);
-					graph.nodes.add(aux);
+					graph.nodes.put(aux.name, aux);
 				}
 				
 				edge.tails.add(aux);
 			}
 			
-			graph.hEdges.add(edge);
+			graph.hEdges.put(edge.name, edge);
 		}
 		
 		return graph;

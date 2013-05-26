@@ -1,20 +1,18 @@
 package back;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
 public class HyperGraph {
 
-    protected List<HyperEdge> hEdges = new LinkedList<HyperEdge>();
-    protected List<Node> nodes = new LinkedList<Node>();
+    protected Map<String, HyperEdge> hEdges = new HashMap<String, HyperEdge>();
+    protected Map<String, Node> nodes = new HashMap<String, Node>();
 
     protected String name;
 
@@ -27,8 +25,8 @@ public class HyperGraph {
 
 	this.start = start;
 	this.end = end;
-	nodes.add(start);
-	nodes.add(end);
+	nodes.put(start.name, start);
+	nodes.put(end.name, end);
     }
 
     protected static class Node  {
@@ -210,7 +208,7 @@ public class HyperGraph {
 	HyperGraph subgraph = new HyperGraph(new Node(start.name), newEnd );
 	
 	HyperEdge aux = new HyperEdge(hEdge.name, hEdge.numberOfEntries, hEdge.weight);
-	subgraph.hEdges.add(aux);
+	subgraph.hEdges.put(aux.name, aux);
 	generateResult(subgraph, hEdge, aux);
 	aux.tails.add(newEnd);
 	
@@ -228,7 +226,7 @@ public class HyperGraph {
 	for (HyperEdge parentEdge : current.parents) {
 	    
 	    HyperEdge newParentEdge = new HyperEdge(parentEdge.name, parentEdge.numberOfEntries, parentEdge.weight);
-	    subgraph.hEdges.add(newParentEdge);
+	    subgraph.hEdges.put(newParentEdge.name, newParentEdge);
 	    subgraph.addCommonChilds(current, parentEdge, newCurrent, newParentEdge);
 	    generateResult(subgraph, parentEdge, newParentEdge);
 	    
@@ -253,8 +251,8 @@ public class HyperGraph {
 			aux.destinationEdges.add(newHEdge);
 			newHEdge.heads.add(aux);
 			
-			if(!nodes.contains(aux)){
-			    nodes.add(aux);
+			if(!nodes.containsKey(aux.name)){
+			    nodes.put(aux.name, aux);
 			    
 			    
 			}
@@ -319,6 +317,10 @@ public class HyperGraph {
 	it = hEdge.parents.iterator();
 	hEdge.tag = it.next().tag + 1;
 
+    }
+    
+    public Node getStart(){
+	return start;
     }
 
 }
