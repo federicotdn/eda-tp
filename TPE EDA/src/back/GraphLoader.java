@@ -15,7 +15,10 @@ public class GraphLoader
 {
 	public static void main(String[] args) throws IOException
 	{
-		loadGraph("pinchador.hg");
+		HyperGraph a= loadGraph("pinchador.hg");
+		GraphSaver.toDOT(a);
+		System.out.println("grafo generado.");
+		
 	}
 	
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
@@ -35,6 +38,8 @@ public class GraphLoader
 		FileReader fileinput = new FileReader(filename);
 		BufferedReader reader = new BufferedReader(fileinput);
 		
+		String graphName = filename.substring(0, filename.length() - 3);
+		
 		String line;
 		LinkedList<String> lineTags;
 		
@@ -51,6 +56,8 @@ public class GraphLoader
 		end = new Node(parseSingleTag(secondLine));
 		
 		HyperGraph graph = new HyperGraph(start, end);
+		
+		graph.name = graphName;
 		
 		nodes.put(start.name, start);
 		nodes.put(end.name, end);
@@ -107,6 +114,8 @@ public class GraphLoader
 				
 				edge.tails.add(aux);
 			}
+			
+			graph.hEdges.add(edge);
 		}
 		
 		return graph;
