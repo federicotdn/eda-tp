@@ -13,14 +13,6 @@ import back.HyperGraph.Node;
 
 public class GraphLoader
 {
-	public static void main(String[] args) throws IOException
-	{
-		HyperGraph a= loadGraph("pinchador.hg");
-		GraphSaver.toDOT(a);
-		System.out.println("grafo generado.");
-		
-	}
-	
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
 	static String errorMessagePattern = "Nombres deben ser alfanumericos.";
 	static String errorMessageFormat = "Archivo mal formado.";
@@ -122,7 +114,7 @@ public class GraphLoader
 		return graph;
 	}
 	
-	public static String parseSingleTag(String line) throws IOException
+	private static String parseSingleTag(String line) throws IOException
 	{
 		if (!line.startsWith("<") || !line.endsWith(">"))
 			throw new IOException(errorMessageFormat);
@@ -137,7 +129,7 @@ public class GraphLoader
 		return content;
 	}
 
-	public static LinkedList<String> parseMultipleTags(String lineString) throws IOException
+	private static LinkedList<String> parseMultipleTags(String lineString) throws IOException
 	{
 		LinkedList<String> tags= new LinkedList<String>();
 		StringBuilder current = null;
@@ -185,6 +177,5 @@ public class GraphLoader
 			throw new IOException(errorMessageFormat);
 		
 		return tags;
-		
 	}
 }
