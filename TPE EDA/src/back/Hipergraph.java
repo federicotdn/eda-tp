@@ -3,11 +3,10 @@ package back;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-
-import back.Hipergraph.Node.Hiperedge;
 
 public class Hipergraph {
 
@@ -37,93 +36,124 @@ public class Hipergraph {
 	    destinationEdges = new ArrayList<Hiperedge>();
 
 	}
-
-	protected static class Hiperedge implements Comparable<Hiperedge> {
-
-	    public String name;
-
-	    public List<Node> heads = new ArrayList<Node>();
-	    public List<Node> tails = new ArrayList<Node>();
-	    public Set<Hiperedge> parents = new HashSet<Hiperedge>();
-
-	    public boolean visited;
-
-	    public final int numberOfEntries;
-	    public int currentEntriesCount;
-	    public final Double weight;
-	    public Double distance;
-
-	    public Hiperedge(String name, int numberOfEntries, Double weight) {
-
-		this.name = name;
-		this.numberOfEntries = numberOfEntries;
-		this.weight = weight;
-		this.distance = weight;
-	    }
-
-	    public int compareTo(Hiperedge o) {
-
-		return this.distance.compareTo(o.distance);
-	    }
-
-	    private void addVisitor() {
-
-		currentEntriesCount++;
-	    }
-
-	    private void addParentToChildren() {
-
-		for (Node node : this.tails) {
-		    node.tempoParentCount++;
-		}
-	    }
-
-	    private void substractParentToChildren() {
-
-		for (Node node : this.tails) {
-		    node.tempoParentCount--;
-		}
-	    }
-
-	    private boolean hasMissingParents() {
-
-		for (Node node : this.tails) {
-		    if (node.tempoParentCount == 0) {
-			return true;
-		    }
-		}
-
-		return false;
-	    }
-	    
-	    private void calculateDitance(){
-		
-		for(Hiperedge hEdge: this.parents){
-		    this.distance += hEdge.distance;
-		}
-	    }
-
-	    
-
+	
+	@Override
+	public String toString() {
+	
+	    // TODO Auto-generated method stub
+	    return name;
 	}
     }
 
-    public void exactAlgorithm() {
+    protected static class Hiperedge implements Comparable<Hiperedge> {
 
-	PriorityQueue<Hiperedge> hq = new PriorityQueue<Hiperedge>();
-	Hiperedge hEdge;
+	public String name;
+
+	public List<Node> heads = new ArrayList<Node>();
+	public List<Node> tails = new ArrayList<Node>();
+	public Set<Hiperedge> parents = new HashSet<Hiperedge>();
+
+	public boolean visited;
+
+	public final int numberOfEntries;
+	public int currentEntriesCount;
+	public final Double weight;
+	public Double distance;
+
+	public Hiperedge(String name, int numberOfEntries, Double weight) {
+
+	    this.name = name;
+	    this.numberOfEntries = numberOfEntries;
+	    this.weight = weight;
+	    this.distance = weight;
+	}
+
+	public int compareTo(Hiperedge o) {
+
+	    return this.distance.compareTo(o.distance);
+	}
+
+	private void addVisitor() {
+
+	    currentEntriesCount++;
+	}
+
+	private void addParentToChildren() {
+
+	    for (Node node : this.tails) {
+		node.tempoParentCount++;
+	    }
+	}
+
+	private void substractParentToChildren() {
+
+	    for (Node node : this.tails) {
+		node.tempoParentCount--;
+	    }
+	}
+
+	private boolean hasMissingParents() {
+
+	    for (Node node : this.tails) {
+		if (node.tempoParentCount == 0) {
+		    return true;
+		}
+	    }
+
+	    return false;
+	}
+
+	private void calculateDitance() {
+
+	    for (Hiperedge hEdge : this.parents) {
+		this.distance += hEdge.distance;
+	    }
+	}
+
+	@Override
+	public String toString() {
+
+	    // TODO Auto-generated method stub
+	    return name + " (" + weight + ")";
+	}
+
+    }
+
+    public List<Hiperedge> exactAlgorithm() {
+
+	Hiperedge hEdge = null;
+	boolean hasEnded = false;
 
 	for (Hiperedge edges : start.destinationEdges) {
 	    hq.offer(edges);
 	}
 
-	while (!hq.isEmpty()) {
+	while (!hq.isEmpty() && !hasEnded) {
 	    hEdge = hq.poll();
-	    
+
+	    for (Node node : hEdge.tails) {
+		if (node == end) {
+		    hasEnded = true;
+		    break;
+		}
+	    }
 	    procesHEdge(hEdge);
 
 	}
 
+	List<Hiperedge> list = new LinkedList<Hiperedge>();
+
+	generateResult(list, hEdge);
+	return list;
+
+    }
+
+    private void generateResult(List<Hiperedge> list, Hiperedge hEdge) {
+
+	for (Hiperedge edge : hEdge.parents) {
+	    generateResult(list, edge);
+	}
+	list.add(hEdge);
     }
 
     private void procesHEdge(Hiperedge hEdge) {
@@ -131,6 +161,7 @@ public class Hipergraph {
 	hEdge.visited = true;
 
 	for (Node node : hEdge.tails) {
+
 	    if (!node.visited) {
 		node.visited = true;
 
@@ -142,15 +173,15 @@ public class Hipergraph {
 			removeUnnecesaryParents(edge);
 			edge.calculateDitance();
 			hq.offer(edge);
-			
-			
+
 		    }
 		}
 
 	    }
 	}
+
     }
-    
+
     private void removeUnnecesaryParents(Hiperedge hEdge) {
 
 	for (Node node : hEdge.heads) {
@@ -170,7 +201,7 @@ public class Hipergraph {
 
 	    if (!current.hasMissingParents()) {
 		it.remove();
-		
+
 	    } else {
 
 		current.addParentToChildren();
@@ -178,5 +209,4 @@ public class Hipergraph {
 	}
     }
 
-    ////putoooo
 }
