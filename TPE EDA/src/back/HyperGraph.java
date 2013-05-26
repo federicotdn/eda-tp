@@ -14,24 +14,24 @@ import java.util.Set;
 public class HyperGraph {
 
     protected List<HyperEdge> hEdges = new LinkedList<HyperEdge>();
-    protected List<Node>  nodes = new LinkedList<Node>();
-    
+    protected List<Node> nodes = new LinkedList<Node>();
+
     protected String name;
-    
+
     private Node start;
     private Node end;
-    
+
     private PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>();
-    
-    
 
     public HyperGraph(Node start, Node end) {
 
 	this.start = start;
 	this.end = end;
+	nodes.add(start);
+	nodes.add(end);
     }
 
-    protected static class Node {
+    protected static class Node  {
 
 	public String name;
 
@@ -47,13 +47,36 @@ public class HyperGraph {
 	    destinationEdges = new ArrayList<HyperEdge>();
 
 	}
-	
+
 	@Override
 	public String toString() {
-	
+
 	    // TODO Auto-generated method stub
 	    return name;
 	}
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+
+	    if (this == obj)
+		return true;
+	    if (obj == null)
+		return false;
+	    if (getClass() != obj.getClass())
+		return false;
+	    Node other = (Node) obj;
+	    if (name == null) {
+		if (other.name != null)
+		    return false;
+	    } else if (!name.equals(other.name))
+		return false;
+	    return true;
+	}
+	
+	
+	
     }
 
     protected static class HyperEdge implements Comparable<HyperEdge> {
@@ -69,6 +92,8 @@ public class HyperGraph {
 	public final int numberOfEntries;
 	public int currentEntriesCount;
 	public final Double weight;
+	public int tag = 1;
+
 	public Double distance;
 
 	public HyperEdge(String name, int numberOfEntries, Double weight) {
@@ -120,9 +145,10 @@ public class HyperGraph {
 		this.distance += hEdge.distance;
 	    }
 	}
-	
-	public void prepareParentNodes(){
-	    for(Node node: this.heads){
+
+	public void prepareParentNodes() {
+
+	    for (Node node : this.heads) {
 		node.destinationEdges.add(this);
 	    }
 	}
@@ -134,9 +160,30 @@ public class HyperGraph {
 	    return name + " (" + weight + ")";
 	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+
+	    if (this == obj)
+		return true;
+	    if (obj == null)
+		return false;
+	    if (getClass() != obj.getClass())
+		return false;
+	    HyperEdge other = (HyperEdge) obj;
+	    if (name == null) {
+		if (other.name != null)
+		    return false;
+	    } else if (!name.equals(other.name))
+		return false;
+	    return true;
+	}
+	
+	
+
     }
 
-    public List<HyperEdge> exactAlgorithm() {
+    public HyperGraph exactAlgorithm() {
 
 	HyperEdge hEdge = null;
 	boolean hasEnded = false;
@@ -158,19 +205,63 @@ public class HyperGraph {
 
 	}
 
-	List<HyperEdge> list = new LinkedList<HyperEdge>();
+	Node newEnd = new Node(end.name);
 
-	generateResult(list, hEdge);
-	return list;
+	HyperGraph subgraph = new HyperGraph(new Node(start.name), newEnd );
+	
+	HyperEdge aux = new HyperEdge(hEdge.name, hEdge.numberOfEntries, hEdge.weight);
+	subgraph.hEdges.add(aux);
+	generateResult(subgraph, hEdge, aux);
+	aux.tails.add(newEnd);
+	
+	
+	subgraph.name = this.name;
+
+	return subgraph;
 
     }
 
-    private void generateResult(List<HyperEdge> list, HyperEdge hEdge) {
+    private void generateResult(HyperGraph subgraph, HyperEdge current, HyperEdge newCurrent) {
 
-	for (HyperEdge edge : hEdge.parents) {
-	    generateResult(list, edge);
+	
+
+	for (HyperEdge parentEdge : current.parents) {
+	    
+	    HyperEdge newParentEdge = new HyperEdge(parentEdge.name, parentEdge.numberOfEntries, parentEdge.weight);
+	    subgraph.hEdges.add(newParentEdge);
+	    subgraph.addCommonChilds(current, parentEdge, newCurrent, newParentEdge);
+	    generateResult(subgraph, parentEdge, newParentEdge);
+	    
 	}
-	list.add(hEdge);
+	if(current.parents.isEmpty()){
+	    newCurrent.heads.add(subgraph.start);
+	    subgraph.start.destinationEdges.add(newCurrent);
+	}
+	
+	
+    }
+
+    private void addCommonChilds(HyperEdge hEdge, HyperEdge parent, HyperEdge newHEdge, HyperEdge newParent) {
+
+
+	for (Node node : hEdge.heads) {
+	    for (Node parentNode : parent.tails) {
+		if (node == parentNode) {
+		    Node aux = new Node(node.name);
+		    if (!newParent.tails.contains(aux)) {
+			newParent.tails.add(aux);
+			aux.destinationEdges.add(newHEdge);
+			newHEdge.heads.add(aux);
+			
+			if(!nodes.contains(aux)){
+			    nodes.add(aux);
+			    
+			    
+			}
+		    }
+		}
+	    }
+	}
     }
 
     private void procesHEdge(HyperEdge hEdge) {
@@ -224,7 +315,10 @@ public class HyperGraph {
 		current.addParentToChildren();
 	    }
 	}
+
+	it = hEdge.parents.iterator();
+	hEdge.tag = it.next().tag + 1;
+
     }
-    
 
 }
