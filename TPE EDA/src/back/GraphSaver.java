@@ -12,10 +12,10 @@ public class GraphSaver {
 
     public static void toDOT(HyperGraph hGraph) throws IOException{
 	
-	FileWriter fileOutput = new FileWriter("grafo.dot");
+	FileWriter fileOutput = new FileWriter(hGraph.name + ".min.dot");
 	BufferedWriter writer = new BufferedWriter(fileOutput);
 	
-	writer.write("digraph prueba {");
+	writer.write("digraph  {");
 	
 	for(Node node: hGraph.nodes){
 	    writer.write(node.name + " [label=" + node.name + "]");

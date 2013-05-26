@@ -67,13 +67,14 @@ public class Test
 	   h.destinationEdges.add(j);
 	   
 	   
-	   System.out.println(hg.exactAlgorithm());
+
 	   try {
-	    GraphSaver.toDOT(hg);
+	    GraphSaver.toDOT(hg.exactAlgorithm());
 	} catch (IOException e1) {
 	    // TODO Auto-generated catch block
 	    e1.printStackTrace();
 	}
+	   System.out.println(i.tag);
 
 
 	   
