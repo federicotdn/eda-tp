@@ -5,29 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
+import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
 
 public class GraphLoader
 {
 	public static void main(String[] args) throws IOException
 	{
-		System.out.println(parseSingleTag("<holah3234c>"));
-		
-		FileReader fileinput = new FileReader("pinchador.hg");
-		BufferedReader reader = new BufferedReader(fileinput);
-		
-		LinkedList<String> aux = null;
-		
-		while (reader.ready())
-		{
-			aux = parseMultipleTags(reader.readLine());
-			
-			for (String s : aux)
-				System.out.println(s);
-			System.out.println("-------FINAL LINEA-------");
-		}
+		loadGraph("pinchador.hg");
 	}
 	
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
@@ -37,6 +25,7 @@ public class GraphLoader
 	static String alphaNumericPattern = "^[a-zA-Z0-9]*$";
 	
 	final static int minTagLength = 1, maxTagLength = 10;
+	final static int minTagsPerLine = 6;
 	
 	static public HyperGraph loadGraph(String filename) throws IOException, FileNotFoundException
 	{
@@ -45,6 +34,9 @@ public class GraphLoader
 		
 		FileReader fileinput = new FileReader(filename);
 		BufferedReader reader = new BufferedReader(fileinput);
+		
+		String line;
+		LinkedList<String> lineTags;
 		
 		HashMap<String, Node> nodes = new HashMap<String, Node>();
 		
@@ -58,18 +50,66 @@ public class GraphLoader
 		start = new Node(parseSingleTag(firstLine));
 		end = new Node(parseSingleTag(secondLine));
 		
+		HyperGraph graph = new HyperGraph(start, end);
 		
-		
+		nodes.put(start.name, start);
+		nodes.put(end.name, end);
 		
 		while (reader.ready())
 		{
-			String line = reader.readLine();
+			line = reader.readLine();
+			lineTags = parseMultipleTags(line);
+			Iterator<String> iterator = lineTags.iterator();
 			
+			String edgeName = iterator.next();
+			double edgeWeight = Double.valueOf(iterator.next());
 			
+			int entryCount = Integer.valueOf(iterator.next());
 			
+			HyperEdge edge = new HyperEdge(edgeName, entryCount, edgeWeight);
+			
+			Node aux;
+			
+			for (; entryCount > 0; entryCount--)
+			{
+				String nodeName = iterator.next();
+				
+				if (nodes.containsKey(nodeName))
+					aux = nodes.get(nodeName);
+				else
+				{
+					aux = new Node(nodeName);
+					
+					nodes.put(nodeName, aux);			
+					graph.nodes.add(aux);
+				}
+				
+				edge.heads.add(aux);
+			}
+			
+			edge.prepareParentNodes();
+			
+			int exitCount = Integer.valueOf(iterator.next());
+			
+			for (; exitCount > 0; exitCount--)
+			{
+				String nodeName = iterator.next();
+				
+				if (nodes.containsKey(nodeName))
+					aux = nodes.get(nodeName);
+				else
+				{
+					aux = new Node(nodeName);
+					
+					nodes.put(nodeName, aux);
+					graph.nodes.add(aux);
+				}
+				
+				edge.tails.add(aux);
+			}
 		}
 		
-		return null;
+		return graph;
 	}
 	
 	public static String parseSingleTag(String line) throws IOException
@@ -131,7 +171,7 @@ public class GraphLoader
 			}
 		}
 		
-		if (inTag)
+		if (inTag || tags.size() < minTagsPerLine)
 			throw new IOException(errorMessageFormat);
 		
 		return tags;
