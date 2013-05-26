@@ -18,13 +18,13 @@ public class GraphSaver {
 	writer.write("digraph  {");
 	
 	for(Node node: hGraph.nodes){
-	    writer.write(node.name + " [label=" + node.name + "]");
+	    writer.write(node.name + " [label=\"" + node.name + "\"]");
 	    writer.newLine();
 	    
 	}
 	
 	for(HyperEdge edge: hGraph.hEdges){
-	    writer.write(edge.name +  " [shape=box, height=0.18, fontsize=12, label=" + edge.name + "]");
+	    writer.write(edge.name +  " [shape=box, height=0.18, fontsize=12, label=\"" + edge.name + " ( " + edge.weight+ " )" +  "\"]");
 	    writer.newLine();
 	    
 	    for(Node node: edge.heads){

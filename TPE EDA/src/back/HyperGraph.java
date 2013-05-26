@@ -161,44 +161,58 @@ public class HyperGraph {
 
 	}
 
+	Node newEnd = new Node(end.name);
 
-	HyperGraph subgraph = new HyperGraph(new Node(start.name), new Node(
-		end.name));
+	HyperGraph subgraph = new HyperGraph(new Node(start.name), newEnd );
 	
-	generateResult(subgraph, hEdge);
+	HyperEdge aux = new HyperEdge(hEdge.name, hEdge.numberOfEntries, hEdge.weight);
+	subgraph.hEdges.add(aux);
+	generateResult(subgraph, hEdge, aux);
+	aux.tails.add(newEnd);
+	
+	
+	subgraph.name = this.name;
 
 	return subgraph;
 
     }
 
-    private void generateResult(HyperGraph subgraph, HyperEdge current) {
+    private void generateResult(HyperGraph subgraph, HyperEdge current, HyperEdge newCurrent) {
 
-	HyperEdge newHEdge = new HyperEdge(current.name, current.numberOfEntries, current.weight);
 	
 
-	for (HyperEdge hEdge : current.parents) {
-	    HyperEdge newParentEdge = new HyperEdge(hEdge.name, hEdge.numberOfEntries, hEdge.weight);
-	    addCommonChilds(current, hEdge, newHEdge, newParentEdge);
-	    generateResult(subgraph, hEdge);
+	for (HyperEdge parentEdge : current.parents) {
+	    
+	    HyperEdge newParentEdge = new HyperEdge(parentEdge.name, parentEdge.numberOfEntries, parentEdge.weight);
+	    subgraph.hEdges.add(newParentEdge);
+	    subgraph.addCommonChilds(current, parentEdge, newCurrent, newParentEdge);
+	    generateResult(subgraph, parentEdge, newParentEdge);
+	    
 	}
-
-
-
+	if(current.parents.isEmpty()){
+	    newCurrent.heads.add(subgraph.start);
+	    subgraph.start.destinationEdges.add(newCurrent);
+	}
+	
+	
     }
 
-    private void addCommonChilds(HyperEdge hEdge, HyperEdge parent,
-	    HyperEdge newHEdge, HyperEdge newParent) {
+    private void addCommonChilds(HyperEdge hEdge, HyperEdge parent, HyperEdge newHEdge, HyperEdge newParent) {
 
-	List<HyperEdge> list = new ArrayList<HyperEdge>(parent.tails.size());
 
 	for (Node node : hEdge.heads) {
 	    for (Node parentNode : parent.tails) {
 		if (node == parentNode) {
 		    Node aux = new Node(node.name);
-		    if (newParent.tails.contains(aux)) {
+		    if (!newParent.tails.contains(aux)) {
 			newParent.tails.add(aux);
+			aux.destinationEdges.add(newHEdge);
 			newHEdge.heads.add(aux);
-			nodes.add(aux);
+			
+			if(!nodes.contains(aux)){
+			    nodes.add(aux);
+			    
+			}
 		    }
 		}
 	    }
