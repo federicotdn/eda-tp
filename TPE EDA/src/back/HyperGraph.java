@@ -73,26 +73,26 @@ public class HyperGraph {
 	    return this.distance.compareTo(o.distance);
 	}
 
-	private void addVisitor() {
+	public void addVisitor() {
 
 	    currentEntriesCount++;
 	}
 
-	private void addParentToChildren() {
+	public void addParentToChildren() {
 
 	    for (Node node : this.tails) {
 		node.tempoParentCount++;
 	    }
 	}
 
-	private void substractParentToChildren() {
+	public void substractParentToChildren() {
 
 	    for (Node node : this.tails) {
 		node.tempoParentCount--;
 	    }
 	}
 
-	private boolean hasMissingParents() {
+	public boolean hasMissingParents() {
 
 	    for (Node node : this.tails) {
 		if (node.tempoParentCount == 0) {
@@ -103,10 +103,16 @@ public class HyperGraph {
 	    return false;
 	}
 
-	private void calculateDitance() {
+	public void calculateDitance() {
 
 	    for (HyperEdge hEdge : this.parents) {
 		this.distance += hEdge.distance;
+	    }
+	}
+	
+	public void prepareParentNodes(){
+	    for(Node node: this.heads){
+		node.destinationEdges.add(this);
 	    }
 	}
 
