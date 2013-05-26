@@ -31,7 +31,7 @@ public class HyperGraph {
 	nodes.add(end);
     }
 
-    protected static class Node {
+    protected static class Node  {
 
 	public String name;
 
@@ -54,6 +54,29 @@ public class HyperGraph {
 	    // TODO Auto-generated method stub
 	    return name;
 	}
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+
+	    if (this == obj)
+		return true;
+	    if (obj == null)
+		return false;
+	    if (getClass() != obj.getClass())
+		return false;
+	    Node other = (Node) obj;
+	    if (name == null) {
+		if (other.name != null)
+		    return false;
+	    } else if (!name.equals(other.name))
+		return false;
+	    return true;
+	}
+	
+	
+	
     }
 
     protected static class HyperEdge implements Comparable<HyperEdge> {
@@ -137,6 +160,27 @@ public class HyperGraph {
 	    return name + " (" + weight + ")";
 	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+
+	    if (this == obj)
+		return true;
+	    if (obj == null)
+		return false;
+	    if (getClass() != obj.getClass())
+		return false;
+	    HyperEdge other = (HyperEdge) obj;
+	    if (name == null) {
+		if (other.name != null)
+		    return false;
+	    } else if (!name.equals(other.name))
+		return false;
+	    return true;
+	}
+	
+	
+
     }
 
     public HyperGraph exactAlgorithm() {
@@ -211,6 +255,7 @@ public class HyperGraph {
 			
 			if(!nodes.contains(aux)){
 			    nodes.add(aux);
+			    
 			    
 			}
 		    }
