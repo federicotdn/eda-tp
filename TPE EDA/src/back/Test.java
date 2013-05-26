@@ -1,7 +1,7 @@
 package back;
 
-import back.Hipergraph.Hiperedge;
-import back.Hipergraph.Node;
+import back.HyperGraph.HyperEdge;
+import back.HyperGraph.Node;
 
 public class Test
 {
@@ -9,18 +9,18 @@ public class Test
 	{
 	    Node start = new Node("A");
 	    Node end = new Node("K");
-	    Hipergraph hg = new Hipergraph(start, end);
+	    HyperGraph hg = new HyperGraph(start, end);
 	    
 	    Node e = new Node("E");
 	    Node f = new Node("F");
 	    Node g = new Node("G");
 	    Node h = new Node("H");
 	    
-	   Hiperedge b = new Hiperedge("B", 1, 4.0);
-	   Hiperedge c = new Hiperedge("C", 1, 2.0);
-	   Hiperedge d = new Hiperedge("D", 1, 3.0);
-	   Hiperedge i = new Hiperedge("I", 3, 1.0);
-	   Hiperedge j = new Hiperedge("J", 2, 8.0);
+	   HyperEdge b = new HyperEdge("B", 1, 4.0);
+	   HyperEdge c = new HyperEdge("C", 1, 2.0);
+	   HyperEdge d = new HyperEdge("D", 1, 3.0);
+	   HyperEdge i = new HyperEdge("I", 3, 1.0);
+	   HyperEdge j = new HyperEdge("J", 2, 8.0);
 	   
 	   b.tails.add(e);
 	   b.tails.add(f);
