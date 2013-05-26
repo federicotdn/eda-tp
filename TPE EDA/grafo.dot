@@ -1,0 +1,66 @@
+digraph prueba {H [label=H]
+I [label=I]
+J [label=J]
+K [label=K]
+L [label=L]
+M [label=M]
+N [label=N]
+O [label=O]
+S [label=S]
+T [label=T]
+U [label=U]
+V [label=V]
+W [label=W]
+X [label=X]
+B [shape=box, height=0.18, fontsize=12, label=B]
+alfa->B
+B->H
+B->I
+C [shape=box, height=0.18, fontsize=12, label=C]
+alfa->C
+C->I
+C->J
+C->K
+C->L
+D [shape=box, height=0.18, fontsize=12, label=D]
+alfa->D
+D->L
+D->M
+F [shape=box, height=0.18, fontsize=12, label=F]
+alfa->F
+F->L
+G [shape=box, height=0.18, fontsize=12, label=G]
+alfa->G
+G->N
+G->O
+P [shape=box, height=0.18, fontsize=12, label=P]
+H->P
+I->P
+J->P
+K->P
+L->P
+P->S
+P->T
+P->U
+Q [shape=box, height=0.18, fontsize=12, label=Q]
+K->Q
+M->Q
+O->Q
+Q->V
+Q->W
+R [shape=box, height=0.18, fontsize=12, label=R]
+M->R
+N->R
+O->R
+R->W
+R->X
+Y [shape=box, height=0.18, fontsize=12, label=Y]
+S->Y
+T->Y
+U->Y
+W->Y
+Y->omega
+Z [shape=box, height=0.18, fontsize=12, label=Z]
+V->Z
+Z->omega
+}

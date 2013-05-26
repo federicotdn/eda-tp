@@ -24,6 +24,7 @@ public class GraphLoader
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
 	static String errorMessagePattern = "Nombres deben ser alfanumericos.";
 	static String errorMessageFormat = "Archivo mal formado.";
+	static String errorMessageFile = "Archivo debe ser formato .hg";
 	
 	static String alphaNumericPattern = "^[a-zA-Z0-9]*$";
 	
@@ -33,7 +34,7 @@ public class GraphLoader
 	static public HyperGraph loadGraph(String filename) throws IOException, FileNotFoundException
 	{
 		if (!filename.endsWith(".hg"))
-			throw new FileNotFoundException();
+			throw new FileNotFoundException(errorMessageFile);
 		
 		FileReader fileinput = new FileReader(filename);
 		BufferedReader reader = new BufferedReader(fileinput);
