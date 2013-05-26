@@ -1,5 +1,8 @@
 package back;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,9 +13,15 @@ import java.util.Set;
 
 public class HyperGraph {
 
+    protected List<HyperEdge> hEdges = new LinkedList<HyperEdge>();
+    protected List<Node>  nodes = new LinkedList<Node>();
+    
     private Node start;
     private Node end;
+    
     private PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>();
+    
+    
 
     public HyperGraph(Node start, Node end) {
 
@@ -214,5 +223,6 @@ public class HyperGraph {
 	    }
 	}
     }
+    
 
 }

@@ -1,5 +1,7 @@
 package back;
 
+import java.io.IOException;
+
 import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
 
@@ -21,6 +23,13 @@ public class Test
 	   HyperEdge d = new HyperEdge("D", 1, 3.0);
 	   HyperEdge i = new HyperEdge("I", 3, 1.0);
 	   HyperEdge j = new HyperEdge("J", 2, 8.0);
+	   
+	   hg.hEdges.add(b);
+	   hg.hEdges.add(c);
+	   hg.hEdges.add(d);
+	   hg.hEdges.add(i);
+	   hg.hEdges.add(j);
+	   
 	   
 	   b.tails.add(e);
 	   b.tails.add(f);
@@ -54,7 +63,12 @@ public class Test
 	   
 	   
 	   System.out.println(hg.exactAlgorithm());
-	   System.out.println(j.distance);
+	   try {
+	    GraphSaver.toDOT(hg);
+	} catch (IOException e1) {
+	    // TODO Auto-generated catch block
+	    e1.printStackTrace();
+	}
 
 
 	   
