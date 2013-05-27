@@ -1,5 +1,7 @@
 package back;
 
+import java.awt.HeadlessException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +20,8 @@ public class HyperGraph {
 
     private Node start;
     private Node end;
+    
+
 
     private PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>();
 
@@ -81,25 +85,35 @@ public class HyperGraph {
 
 	public String name;
 
-	public List<Node> heads = new ArrayList<Node>();
-	public List<Node> tails = new ArrayList<Node>();
+	public List<Node> tail = new ArrayList<Node>();
+	public List<Node> head = new ArrayList<Node>();
 	public Set<HyperEdge> parents = new HashSet<HyperEdge>();
 
 	public boolean visited;
 
-	public final int numberOfEntries;
+	public int numberOfEntries;//hacer final
 	public int currentEntriesCount;
 	public final Double weight;
 	public int tag = 1;
 
 	public Double distance;
 
-	public HyperEdge(String name, int numberOfEntries, Double weight) {
+	public HyperEdge(String name, Double weight) {
 
 	    this.name = name;
-	    this.numberOfEntries = numberOfEntries;
 	    this.weight = weight;
 	    this.distance = weight;
+	}
+	
+	public void setNumberOfEntries( int numberOfEntries){
+	    this.numberOfEntries = numberOfEntries;
+	    
+	}
+	
+	private HyperEdge(HyperEdge hEdge){
+	    this.name = hEdge.name;
+	    this.weight = hEdge.weight;
+	    
 	}
 
 	public int compareTo(HyperEdge o) {
@@ -114,21 +128,21 @@ public class HyperGraph {
 
 	public void addParentToChildren() {
 
-	    for (Node node : this.tails) {
+	    for (Node node : this.head) {
 		node.tempoParentCount++;
 	    }
 	}
 
 	public void substractParentToChildren() {
 
-	    for (Node node : this.tails) {
+	    for (Node node : this.head) {
 		node.tempoParentCount--;
 	    }
 	}
 
 	public boolean hasMissingParents() {
 
-	    for (Node node : this.tails) {
+	    for (Node node : this.head) {
 		if (node.tempoParentCount == 0) {
 		    return true;
 		}
@@ -146,7 +160,7 @@ public class HyperGraph {
 
 	public void prepareParentNodes() {
 
-	    for (Node node : this.heads) {
+	    for (Node node : this.tail) {
 		node.destinationEdges.add(this);
 	    }
 	}
@@ -181,7 +195,7 @@ public class HyperGraph {
 
     }
 
-    public HyperGraph exactAlgorithm() {
+    public double exactAlgorithm() throws IOException {
 
 	HyperEdge hEdge = null;
 	boolean hasEnded = false;
@@ -193,7 +207,7 @@ public class HyperGraph {
 	while (!hq.isEmpty() && !hasEnded) {
 	    hEdge = hq.poll();
 
-	    for (Node node : hEdge.tails) {
+	    for (Node node : hEdge.head) {
 		if (node == end) {
 		    hasEnded = true;
 		    break;
@@ -207,15 +221,28 @@ public class HyperGraph {
 
 	HyperGraph subgraph = new HyperGraph(new Node(start.name), newEnd );
 	
-	HyperEdge aux = new HyperEdge(hEdge.name, hEdge.numberOfEntries, hEdge.weight);
+	HyperEdge aux = new HyperEdge(hEdge.name, hEdge.weight);
 	subgraph.hEdges.put(aux.name, aux);
+	aux.head.add(newEnd);
 	generateResult(subgraph, hEdge, aux);
-	aux.tails.add(newEnd);
+	/*generateResultAlt(subgraph, hEdge);
+	HyperEdge nEdge = new HyperEdge(hEdge);
+	nEdge.tails.add(subgraph.end);
+	subgraph.hEdges.put(hEdge.name, nEdge);*/
+	
+	
 	
 	
 	subgraph.name = this.name;
+	GraphSaver.toDOT(subgraph);
+	GraphSaver.toDOT(this, subgraph);
+	
+	GraphSaver.toTXT(subgraph);
+	//GraphSaver.toTXT(this);
+	
+	System.out.println(subgraph.calculateTotalWeight());
 
-	return subgraph;
+	return hEdge.distance;
 
     }
 
@@ -225,14 +252,14 @@ public class HyperGraph {
 
 	for (HyperEdge parentEdge : current.parents) {
 	    
-	    HyperEdge newParentEdge = new HyperEdge(parentEdge.name, parentEdge.numberOfEntries, parentEdge.weight);
+	    HyperEdge newParentEdge = new HyperEdge(parentEdge.name, parentEdge.weight);
 	    subgraph.hEdges.put(newParentEdge.name, newParentEdge);
 	    subgraph.addCommonChilds(current, parentEdge, newCurrent, newParentEdge);
 	    generateResult(subgraph, parentEdge, newParentEdge);
 	    
 	}
 	if(current.parents.isEmpty()){
-	    newCurrent.heads.add(subgraph.start);
+	    newCurrent.tail.add(subgraph.start);
 	    subgraph.start.destinationEdges.add(newCurrent);
 	}
 	
@@ -242,14 +269,14 @@ public class HyperGraph {
     private void addCommonChilds(HyperEdge hEdge, HyperEdge parent, HyperEdge newHEdge, HyperEdge newParent) {
 
 
-	for (Node node : hEdge.heads) {
-	    for (Node parentNode : parent.tails) {
+	for (Node node : hEdge.tail) {
+	    for (Node parentNode : parent.head) {
 		if (node == parentNode) {
 		    Node aux = new Node(node.name);
-		    if (!newParent.tails.contains(aux)) {
-			newParent.tails.add(aux);
+		    if (!newParent.head.contains(aux)) {
+			newParent.head.add(aux);
 			aux.destinationEdges.add(newHEdge);
-			newHEdge.heads.add(aux);
+			newHEdge.tail.add(aux);
 			
 			if(!nodes.containsKey(aux.name)){
 			    nodes.put(aux.name, aux);
@@ -266,7 +293,7 @@ public class HyperGraph {
 
 	hEdge.visited = true;
 
-	for (Node node : hEdge.tails) {
+	for (Node node : hEdge.head) {
 
 	    if (!node.visited) {
 		node.visited = true;
@@ -290,7 +317,7 @@ public class HyperGraph {
 
     private void removeUnnecesaryParents(HyperEdge hEdge) {
 
-	for (Node node : hEdge.heads) {
+	for (Node node : hEdge.tail) {
 	    node.tempoParentCount = 0;
 	}
 
@@ -321,6 +348,57 @@ public class HyperGraph {
     
     public Node getStart(){
 	return start;
+    }
+    
+    private void generateResultAlt(HyperGraph subgraph, HyperEdge current) {
+	
+	HyperEdge newHEdge;
+	if(!subgraph.hEdges.containsKey(current.name)){
+	    newHEdge = new HyperEdge(current);
+	}
+	else
+	    newHEdge = subgraph.hEdges.get(current.name);
+	    
+	
+	
+	for(HyperEdge hEdge: current.parents){
+	    
+	    HyperEdge newParentHEdge = new HyperEdge(hEdge);
+	    subgraph.hEdges.put(hEdge.name, newParentHEdge);
+	    
+	    
+	    for(Node node: current.tail){
+		Node aux;
+		if(!subgraph.nodes.containsKey(node.name)){
+		    aux = new Node(node.name);
+		    newHEdge.tail.add(aux);
+		}
+		else{
+		    aux = subgraph.nodes.get(node.name);
+		}
+		
+		if(hEdge.head.contains(node)){
+		    aux.destinationEdges.add(newHEdge);
+		    subgraph.nodes.put(node.name, aux );
+		    newParentHEdge.head.add(aux);
+		}
+		
+		
+		
+		
+	    }
+	    generateResultAlt(subgraph, hEdge);
+		
+	}
+    
+    }
+    
+    public double calculateTotalWeight(){
+	double aux = 0;
+	for(HyperEdge edge: hEdges.values()){
+	    aux += edge.weight;
+	}
+	return aux;
     }
 
 }

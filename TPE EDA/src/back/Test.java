@@ -9,7 +9,14 @@ import back.HyperGraph.Node;
 public class Test {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
+	
+	HyperGraph hg = GraphLoader.loadGraph("B.hg");
+	GraphSaver.toDOT(hg);
 
+	System.out.println(hg.exactAlgorithm());
+	
+
+	/*
 	Node start = new Node("A");
 	Node end = new Node("K");
 	HyperGraph hg = new HyperGraph(start, end);
@@ -67,18 +74,14 @@ public class Test {
 	
 	    
 	
-	    System.out.println(i.tag);
 
 	    HyperGraph hGraph = null;
 
 	    hGraph = GraphLoader.loadGraph("pinchador.hg");
 
-	    GraphSaver.toDOT(hGraph, hGraph.exactAlgorithm());
-	    
-	    GraphSaver.toDOT(hg, hg.exactAlgorithm());
-	    
-	    GraphSaver.toDOT(hGraph);
-
+	    System.out.println(hg.exactAlgorithm());
+	    System.out.println(hGraph.exactAlgorithm());
+	   */ 
 	
 	
 	

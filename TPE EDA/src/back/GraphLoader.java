@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
@@ -45,8 +46,8 @@ public class GraphLoader
 		firstLine = reader.readLine();
 		secondLine = reader.readLine();
 	
-		start = new Node(parseSingleTag(firstLine));
-		end = new Node(parseSingleTag(secondLine));
+		start = new Node(parseSingleTagAlt(firstLine));
+		end = new Node(parseSingleTagAlt(secondLine));
 		
 		HyperGraph graph = new HyperGraph(start, end);
 		
@@ -58,38 +59,21 @@ public class GraphLoader
 		while (reader.ready())
 		{
 			line = reader.readLine();
-			lineTags = parseMultipleTags(line);
+			lineTags = parseMultipleTagsAlt(line);
 			Iterator<String> iterator = lineTags.iterator();
 			
 			String edgeName = iterator.next();
 			double edgeWeight = Double.valueOf(iterator.next());
 			
-			int entryCount = Integer.valueOf(iterator.next());
 			
-			HyperEdge edge = new HyperEdge(edgeName, entryCount, edgeWeight);
+			
+			HyperEdge edge = new HyperEdge(edgeName, edgeWeight);
 			
 			Node aux;
 			
-			for (; entryCount > 0; entryCount--)
-			{
-				String nodeName = iterator.next();
-				
-				if (nodes.containsKey(nodeName))
-					aux = nodes.get(nodeName);
-				else
-				{
-					aux = new Node(nodeName);
-					
-					nodes.put(nodeName, aux);			
-					graph.nodes.put(aux.name, aux);
-				}
-				
-				edge.heads.add(aux);
-			}
-			
-			edge.prepareParentNodes();
-			
 			int exitCount = Integer.valueOf(iterator.next());
+			
+
 			
 			for (; exitCount > 0; exitCount--)
 			{
@@ -105,8 +89,34 @@ public class GraphLoader
 					graph.nodes.put(aux.name, aux);
 				}
 				
-				edge.tails.add(aux);
+				edge.head.add(aux);
 			}
+			
+			int entryCount = Integer.valueOf(iterator.next());
+			
+			edge.setNumberOfEntries(entryCount);
+			
+
+			for (; entryCount > 0; entryCount--)
+			{
+				String nodeName = iterator.next();
+				
+				if (nodes.containsKey(nodeName))
+					aux = nodes.get(nodeName);
+				else
+				{
+					aux = new Node(nodeName);
+					
+					nodes.put(nodeName, aux);			
+					graph.nodes.put(aux.name, aux);
+				}
+				
+				edge.tail.add(aux);
+			}
+			
+			edge.prepareParentNodes();
+
+			
 			
 			graph.hEdges.put(edge.name, edge);
 		}
@@ -178,4 +188,33 @@ public class GraphLoader
 		
 		return tags;
 	}
+	
+	private static String parseSingleTagAlt(String line) throws IOException{
+	    return line;
+	}
+	
+	private static LinkedList<String> parseMultipleTagsAlt(String lineString) throws IOException{
+	    LinkedList<String> list = new LinkedList<String>();
+	    char[] line = lineString.toCharArray();
+	    StringBuilder current = new StringBuilder();
+
+	    for(char ch: line){
+		switch (ch) {
+		case ' ':
+		    list.add(current.toString());
+		    current = new StringBuilder();
+		    break;
+
+		default:
+		    
+		    current.append(ch);
+		    break;
+		}
+	    }
+	    list.add(current.toString());
+	    
+	    return list;
+	}
+	
+	
 }
