@@ -83,7 +83,7 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					graph.nodes.put(aux.name, aux);
+					//graph.nodes.put(aux.name, aux);
 				}
 
 				edge.head.add(aux);
@@ -91,7 +91,7 @@ public class GraphLoader
 
 			int entryCount = Integer.valueOf(iterator.next());
 
-			edge.setNumberOfEntries(entryCount);
+			//edge.setNumberOfEntries(entryCount);
 
 			for (; entryCount > 0; entryCount--)
 			{
@@ -104,7 +104,7 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					graph.nodes.put(aux.name, aux);
+					//graph.nodes.put(aux.name, aux);
 				}
 
 				edge.tail.add(aux);
