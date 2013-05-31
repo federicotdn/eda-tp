@@ -3,6 +3,7 @@ package back;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 
 import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
@@ -41,6 +42,91 @@ public class GraphSaver
 			{
 				writer.write("\"" + node.name + "\"->\"" + hEdge.name + "\";");
 				writer.newLine();
+			}
+		}
+
+		writer.write("}");
+		writer.close();
+		System.out.println("Archivo creado: " + hGraph.name + ".dot");
+	}
+	
+	public static void toDOTwithPath(HyperGraph hGraph) throws IOException //especial para grafos con camino marcado
+	{ //hecho asi nomas
+
+		FileWriter fileOutput = new FileWriter(hGraph.name + ".dot");
+		BufferedWriter writer = new BufferedWriter(fileOutput);
+		writer.write("digraph  {");
+		writer.newLine();
+		
+		HashSet<Node> pathNodes = new HashSet<Node>();
+		
+		Node start = hGraph.getStart();
+		Node end = hGraph.getEnd();
+		
+		pathNodes.add(end);
+		
+		writer.write("\"" + start.name + "\"[color=red label=\"" + start.name + "\"];");
+		writer.newLine();
+		writer.write("\"" + end.name + "\"[color=red label=\"" + end.name + "\"];");
+		writer.newLine();
+		
+		for (HyperEdge edge : hGraph.hEdges)
+		{
+			if (edge.visited)
+				pathNodes.addAll(edge.tail);
+		}
+		
+		for (Node node : hGraph.nodes)
+		{
+			if (!pathNodes.contains(node))
+				writer.write("\"" + node.name + "\"[label=\"" + node.name + "\"];");
+			else
+				writer.write("\"" + node.name + "\"[color=red label=\"" + node.name + "\"];");
+			writer.newLine();
+
+		}
+
+		for (HyperEdge hEdge : hGraph.hEdges)
+		{
+			if (!hEdge.visited)
+			{
+				writer.write("\"" + hEdge.name
+						+ "\"[shape=box, height=0.18, fontsize=12, label=\""
+						+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
+				writer.newLine();
+	
+				for (Node node : hEdge.head)
+				{
+					writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\";");
+					writer.newLine();
+				}
+				for (Node node : hEdge.tail)
+				{
+					writer.write("\"" + node.name + "\"->\"" + hEdge.name + "\";");
+					writer.newLine();
+				}
+			}
+			else
+			{
+				writer.write("\"" + hEdge.name
+						+ "\"[color=red shape=box, height=0.18, fontsize=12, label=\""
+						+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
+				writer.newLine();
+				
+				for (Node node : hEdge.tail)
+				{
+					writer.write("\"" + node.name + "\"->\"" + hEdge.name + "\"[style=bold, color=red];");
+					writer.newLine();
+				}
+				
+				for (Node node : hEdge.head)
+				{
+					if (!pathNodes.contains(node))					
+						writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\";");
+					else
+						writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\"[style=bold, color=red];");
+					writer.newLine();
+				}
 			}
 		}
 

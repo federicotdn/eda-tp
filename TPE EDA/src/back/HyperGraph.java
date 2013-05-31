@@ -26,6 +26,19 @@ public class HyperGraph
 		hEdges = new ArrayList<HyperEdge>();
 		nodes = new ArrayList<Node>();
 	}
+	
+
+	public Node getStart()
+	{
+		return start;
+	}
+
+
+	public Node getEnd()
+	{
+		return end;
+	}
+
 
 	protected static class Node
 	{
@@ -52,6 +65,12 @@ public class HyperGraph
 
 			// TODO Auto-generated method stub
 			return name;
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return name.hashCode();
 		}
 	}
 
