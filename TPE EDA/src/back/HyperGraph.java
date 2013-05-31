@@ -122,7 +122,7 @@ public class HyperGraph
 	}
 
 	
-	private void markPath(HyperEdge edge, HashSet<HyperEdge> path)
+	private void markPath(HyperEdge edge, HashSet<HyperEdge> path) //auxlilar, sacar
 	{
 		edge.visited = true;
 		path.add(edge);
@@ -130,6 +130,27 @@ public class HyperGraph
 		for (HyperEdge parent : edge.edgeParents)
 			markPath(parent, path);
 	}
+	
+	private double calculatePath(HyperEdge edge) //auxiliar, sacar
+	{
+		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
+		
+		fillPath(edge, path);
+		
+		double total = 0;
+		for (HyperEdge e : path)
+			total += e.weight;
+		return total;
+	}
+	
+	private void fillPath(HyperEdge edge, HashSet<HyperEdge> path) //auxiliar, sacar
+	{
+		path.add(edge);
+		
+		for (HyperEdge parent : edge.edgeParents)
+			fillPath(parent, path);
+	}
+	
 	
 	//Variables globales de EXACT ALGORITHM despues las saco
 	
@@ -139,6 +160,8 @@ public class HyperGraph
 	
 	int totalcombinaciones = 0;
 	int totalejes = 0;
+	
+	HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); 
 	
 	//end variables globales
 
@@ -167,7 +190,7 @@ public class HyperGraph
 		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
 		float total = 0;
 
-		HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); //puede ser mucho mas general
+		//HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); //puede ser mucho mas general
 
 		for (Node node : edge.tail)
 		{
@@ -209,11 +232,13 @@ public class HyperGraph
 		
 		combinaciones = 0; //debuggear parentCombinations, sacar despues
 
-		edge.distance = edge.weight + combinationWeight(result);
+		//edge.distance = edge.weight + combinationWeight(result);
 		
 		//Si se hace un hashset global no es necesario el clear
-		edge.edgeParents.clear();
+		//edge.edgeParents.clear();
 		edge.edgeParents.addAll(result);
+		
+		edge.distance = calculatePath(edge); //se calcula el peso recursivamente en cada paso (hiper pesado)
 		
 		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}
