@@ -83,12 +83,18 @@ public class HyperGraph
 		{
 			return "[" + name + ", " + weight + "]";
 		}
+		
+		@Override
+		public int hashCode()
+		{
+			return name.hashCode();
+		}
 	}
 
 	public double exactAlgorithm()
 	{
 
-		HyperEdge aux = new HyperEdge(null, 0);
+		HyperEdge aux = new HyperEdge("no uses este nombre", 0);
 		aux.tail.add(end);
 
 		exactAlgorithm(aux);
@@ -155,6 +161,13 @@ public class HyperGraph
 
 		parentCombinations(parents, 0, combination, result);
 		
+//		System.out.print("eleji: "); //sacar
+//		for (HyperEdge e : result) //debugging, sacar
+//		{
+//			System.out.print(e + " ");
+//		}
+//		System.out.print("\n"); //sacar todo!!!
+		
 		if (cantidadComb != combinaciones) //debuggear parentCombinations, sacar despues
 		{
 			System.out.println("No se hicieron la cantidad de combinaciones necesarias.");
@@ -176,12 +189,17 @@ public class HyperGraph
 		{
 			HashSet<HyperEdge> tempResult = new HashSet<HyperEdge>();
 			
-			//System.out.println("una combinacion es: " + combination);
+//			System.out.print("combinacion: "); //sacar
+//			for (HyperEdge e : combination) //debugging, sacar
+//			{
+//				System.out.print(e + " ");
+//			}
+//			System.out.print("\n"); //sacar
 
 			for (HyperEdge edge : combination)
 				tempResult.add(edge);
 
-			if (combinationWeight(tempResult) < combinationWeight(result))
+			if (combinationWeight(tempResult) < combinationWeight(result) || result.isEmpty())
 			{
 				result.clear();
 				result.addAll(tempResult);
