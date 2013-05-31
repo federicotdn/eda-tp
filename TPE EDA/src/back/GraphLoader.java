@@ -57,8 +57,12 @@ public class GraphLoader
 		nodes.put(end.name, end);
 
 		while (reader.ready())
-		{
+		{	
 			line = reader.readLine();
+			
+			if (line.startsWith("#"))
+				continue;
+			
 			lineTags = parseMultipleTagsAlt(line);
 			Iterator<String> iterator = lineTags.iterator();
 
