@@ -86,6 +86,8 @@ public class HyperGraph
 		public boolean visited;
 
 		public final double weight;
+		
+		public EdgePath path; //si anda entonces no es necesario tener distance
 
 		public double distance;
 
