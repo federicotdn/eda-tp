@@ -11,7 +11,7 @@ public class Testing
 		
 		GraphSaver.toDOT(g);
 		
-		System.out.println("Camino minimo pesa: " + g.exactAlgorithm());
+		System.out.println("Camino minimo pesa: " + g.exactAlgorithm() + " (en teoria)");
 		System.out.println("Visitados: " + g.visited.size());
 		
 		g.name = g.name + "Solved";

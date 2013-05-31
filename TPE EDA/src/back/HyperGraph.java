@@ -92,7 +92,10 @@ public class HyperGraph
 
 	public double exactAlgorithm()
 	{
-
+		System.out.println("Comenzando EXAL.");
+		
+		long time = System.currentTimeMillis();
+		
 		HyperEdge aux = new HyperEdge("no uses este nombre", 0);
 		aux.tail.add(end);
 
@@ -106,6 +109,12 @@ public class HyperGraph
 		double total = 0;
 		for (HyperEdge e : path)
 			total += e.weight;
+		
+		System.out.println("EXAL termino.");
+		System.out.println("Tardó: " + (System.currentTimeMillis() - time) + " milisegundos.");
+		
+		System.out.println("Se visitaron: " + totalejes + " ejes");
+		System.out.println("Se calcularon: " + totalcombinaciones + " combinaciones");
 		
 		System.out.println("Peso real del camino es: " + total); //imprimir peso real
 		
@@ -128,6 +137,9 @@ public class HyperGraph
 	
 	int combinaciones = 0;
 	
+	int totalcombinaciones = 0;
+	int totalejes = 0;
+	
 	//end variables globales
 
 	public void exactAlgorithm(HyperEdge edge)
@@ -136,6 +148,7 @@ public class HyperGraph
 		//System.out.println("Parseando edge: " + edge.name);
 		
 		visited.add(edge);
+		totalejes++;
 		
 		//DEBUG end
 		
@@ -229,6 +242,7 @@ public class HyperGraph
 				result.addAll(tempResult);
 			}
 			
+			totalcombinaciones++; //sacar
 			combinaciones++; //debugging, sacar
 			
 			return;
