@@ -7,7 +7,7 @@ public class Testing
 {
 	public static void main(String[] args) throws FileNotFoundException, IOException
 	{
-		HyperGraph g = GraphLoader.loadGraph("generated 2.hg");
+		HyperGraph g = GraphLoader.loadGraph("generated2.hg");
 		
 		GraphSaver.toDOT(g);
 		
