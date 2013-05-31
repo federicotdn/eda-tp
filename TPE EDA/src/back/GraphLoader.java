@@ -44,7 +44,7 @@ public class GraphLoader
 
 		String firstLine, secondLine;
 		firstLine = reader.readLine();
-		secondLine = reader.readLine();
+		secondLine = reader.readLine(); //TODAVIA NO ANDA SI HAY COMENTARIOS EN LAS PRIMERAS LINEAS
 
 		start = new Node(parseSingleTagAlt(firstLine));
 		end = new Node(parseSingleTagAlt(secondLine));

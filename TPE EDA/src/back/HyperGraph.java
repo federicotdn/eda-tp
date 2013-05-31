@@ -99,6 +99,10 @@ public class HyperGraph
 	//Variables globales de EXACT ALGORITHM despues las saco
 	
 	public HashSet<HyperEdge> visited = new HashSet<HyperEdge>();
+	
+	int combinaciones = 0;
+	
+	//end variables globales
 
 	public void exactAlgorithm(HyperEdge edge)
 	{
@@ -114,7 +118,7 @@ public class HyperGraph
 			Node aux = edge.tail.get(0);
 			if (aux.tail.isEmpty())
 			{
-				System.out.println("Llegue al nodo inicio.");
+				//System.out.println("Llegue al nodo inicio.");
 				edge.distance = edge.weight;
 				return;
 			}
@@ -140,22 +144,29 @@ public class HyperGraph
 
 		HyperEdge[] combination = new HyperEdge[edge.tail.size()];
 		HashSet<HyperEdge> result = new HashSet<HyperEdge>();
+		
+		int cantidadComb = 1; //debuggear parentCombinations, sacar despues
 
 		for (Node node : edge.tail)
 		{
 			parents.add(node.tail);
+			cantidadComb *= node.tail.size(); //debuggear parentCombinations, sacar despues
 		}
 
 		parentCombinations(parents, 0, combination, result);
+		
+		if (cantidadComb != combinaciones) //debuggear parentCombinations, sacar despues
+		{
+			System.out.println("No se hicieron la cantidad de combinaciones necesarias.");
+			System.out.println("Deberian haber " + cantidadComb + " pero hubieron " + combinaciones);
+		}
+		
+		combinaciones = 0; //debuggear parentCombinations, sacar despues
 
 		edge.distance = edge.weight + combinationWeight(result);
 		
-		System.out.println("Distancia acumulada es: " + edge.distance);
+		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}
-
-	// "To understand recursion, you must first understand recursion" -
-	// Morpheus, Matrix: the Prelude
-	// "Im in." - Neo, Matrix 4 balls
 
 	public void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
 			int index, HyperEdge[] combination,
@@ -165,7 +176,7 @@ public class HyperGraph
 		{
 			HashSet<HyperEdge> tempResult = new HashSet<HyperEdge>();
 			
-			System.out.println("una combinacion es: " + combination);
+			//System.out.println("una combinacion es: " + combination);
 
 			for (HyperEdge edge : combination)
 				tempResult.add(edge);
@@ -175,6 +186,8 @@ public class HyperGraph
 				result.clear();
 				result.addAll(tempResult);
 			}
+			
+			combinaciones++; //debugging, sacar
 			
 			return;
 		}
@@ -191,10 +204,10 @@ public class HyperGraph
 
 	private float combinationWeight(HashSet<HyperEdge> comb)
 	{
-		float weight = 0;
+		float sum = 0;
 		for (HyperEdge e : comb)
-			weight += e.distance;
-		return weight;
+			sum += e.distance;
+		return sum;
 	}
 
 	// Alt algorithm abajo
