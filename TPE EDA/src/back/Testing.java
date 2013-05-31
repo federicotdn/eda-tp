@@ -9,6 +9,9 @@ public class Testing
 	{
 		HyperGraph g = GraphLoader.loadGraph("A.hg");
 		
-		GraphSaver.toDOT(g);
+		System.out.println(g.exactAlgorithm());
+		System.out.println("Visitados: " + g.visited.size());
+		
+		//GraphSaver.toDOT(g);
 	}
 }

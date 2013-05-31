@@ -1,6 +1,7 @@
 SOURCE
 TARGET
 # Especificacion hipergrafo
+# tiene 248 ejes
 A0 1 17 0a_0 0a_1 0a_2 0a_3 0a_4 0a_5 0a_6 0a_7 0a_8 0a_9 0a_10 0a_11 0a_12 0a_13 0a_14 0a_15 0a_16 1 SOURCE
 A1 12 1 1a_10 2 0a_6 0a_4
 A2 13 1 1a_2 2 0a_15 0a_12

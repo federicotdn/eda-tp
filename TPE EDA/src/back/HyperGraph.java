@@ -77,25 +77,44 @@ public class HyperGraph
 			this.weight = weight;
 			this.numberOfEntries = numberOfEntries;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return "[" + name + ", " + weight + "]";
+		}
 	}
 
-	public void exactAlgorithm()
+	public double exactAlgorithm()
 	{
 
 		HyperEdge aux = new HyperEdge(null, 0);
 		aux.tail.add(end);
 
 		exactAlgorithm(aux);
-
+		
+		return aux.distance;
 	}
+	
+	//Variables globales de EXACT ALGORITHM despues las saco
+	
+	public HashSet<HyperEdge> visited = new HashSet<HyperEdge>();
 
 	public void exactAlgorithm(HyperEdge edge)
 	{
+		//DEBUG start
+		//System.out.println("Parseando edge: " + edge.name);
+		
+		visited.add(edge);
+		
+		//DEBUG end
+		
 		if (edge.tail.size() == 1)
 		{
 			Node aux = edge.tail.get(0);
 			if (aux.tail.isEmpty())
 			{
+				System.out.println("Llegue al nodo inicio.");
 				edge.distance = edge.weight;
 				return;
 			}
@@ -105,7 +124,7 @@ public class HyperGraph
 		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
 		float total = 0;
 
-		HashSet<HyperEdge> calculated = new HashSet<HyperEdge>();
+		HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); //puede ser mucho mas general
 
 		for (Node node : edge.tail)
 		{
@@ -127,22 +146,26 @@ public class HyperGraph
 			parents.add(node.tail);
 		}
 
-		parentCombinations(parents, 0, calculated, combination, result);
+		parentCombinations(parents, 0, combination, result);
 
-		edge.distance = combinationWeight(result);
+		edge.distance = edge.weight + combinationWeight(result);
+		
+		System.out.println("Distancia acumulada es: " + edge.distance);
 	}
 
 	// "To understand recursion, you must first understand recursion" -
 	// Morpheus, Matrix: the Prelude
 	// "Im in." - Neo, Matrix 4 balls
 
-	private void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
-			int index, HashSet<HyperEdge> calculated, HyperEdge[] combination,
+	public void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
+			int index, HyperEdge[] combination,
 			HashSet<HyperEdge> result)
 	{
 		if (index == parents.size())
 		{
 			HashSet<HyperEdge> tempResult = new HashSet<HyperEdge>();
+			
+			System.out.println("una combinacion es: " + combination);
 
 			for (HyperEdge edge : combination)
 				tempResult.add(edge);
@@ -152,6 +175,8 @@ public class HyperGraph
 				result.clear();
 				result.addAll(tempResult);
 			}
+			
+			return;
 		}
 
 		ArrayList<HyperEdge> edges = parents.get(index);
@@ -159,7 +184,7 @@ public class HyperGraph
 		for (HyperEdge edge : edges)
 		{
 			combination[index] = edge;
-			parentCombinations(parents, index + 1, calculated, combination,
+			parentCombinations(parents, index + 1, combination,
 					result);
 		}
 	}
