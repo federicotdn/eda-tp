@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import back.HyperGraph.HyperEdge;
+import back.HyperGraph.Node;
+
 public class AltGraph
 {
 
@@ -27,6 +30,14 @@ public class AltGraph
 		nodes = new ArrayList<Node>();
 	}
 	
+	public AltGraph(HyperGraph graph)
+	{
+		this.start = graph.getStart();
+		this.end = graph.getEnd();
+		this.name = graph.name;
+		hEdges = graph.hEdges;
+		nodes = graph.nodes;
+	}
 
 	public Node getStart()
 	{
@@ -37,76 +48,6 @@ public class AltGraph
 	public Node getEnd()
 	{
 		return end;
-	}
-
-
-	protected static class Node
-	{
-
-		public String name;
-
-		public ArrayList<HyperEdge> head;
-		public ArrayList<HyperEdge> tail;
-
-		public boolean visited;
-
-		public Node(String name)
-		{
-
-			this.name = name;
-			tail = new ArrayList<HyperEdge>();
-			head = new ArrayList<HyperEdge>();
-
-		}
-
-		@Override
-		public String toString()
-		{
-
-			// TODO Auto-generated method stub
-			return name;
-		}
-		
-		@Override
-		public int hashCode()
-		{
-			return name.hashCode();
-		}
-	}
-
-	protected static class HyperEdge
-	{
-
-		public String name;
-
-		public List<Node> tail = new ArrayList<Node>();
-		public List<Node> head = new ArrayList<Node>();
-		public List<HyperEdge> edgeParents = new ArrayList<HyperEdge>();
-
-		public boolean visited;
-
-		public final double weight;
-
-		public double distance;
-
-		public HyperEdge(String name, double weight)
-		{
-			this.name = name;
-			this.weight = weight;
-			visited = false;
-		}
-		
-		@Override
-		public String toString()
-		{
-			return "[" + name + ", " + weight + "]";
-		}
-		
-		@Override
-		public int hashCode()
-		{
-			return name.hashCode();
-		}
 	}
 
 	public double exactAlgorithm()
@@ -261,6 +202,8 @@ public class AltGraph
 		
 		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}
+	
+	private float resultWeight = 0;
 
 	public void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
 			int index, HyperEdge[] combination,
@@ -279,11 +222,14 @@ public class AltGraph
 
 			for (HyperEdge edge : combination)
 				tempResult.add(edge);
+			
+			float tempResultWeight = combinationWeight(tempResult);
 
-			if (combinationWeight(tempResult) < combinationWeight(result) || result.isEmpty())
+			if (tempResultWeight < resultWeight || result.isEmpty())
 			{
 				result.clear();
 				result.addAll(tempResult);
+				resultWeight = tempResultWeight;
 			}
 			
 			totalcombinaciones++; //sacar

@@ -9,12 +9,13 @@ public class Testing
 	{
 		HyperGraph g = GraphLoader.loadGraph("generated2.hg");
 		
-		GraphSaver.toDOT(g);
+		AltGraph a = new AltGraph(g);
+	
+		a.exactAlgorithm();
 		
-		System.out.println("Camino minimo pesa: " + g.exactAlgorithm() + " (en teoria)");
-		System.out.println("Visitados: " + g.visited.size());
+		//GraphSaver.toDOT(g);
 		
-		g.name = g.name + "Solved";
-		GraphSaver.toDOTwithPath(g);
+		//g.name = g.name + "Solved";
+		//GraphSaver.toDOTwithPath(g);
 	}
 }
