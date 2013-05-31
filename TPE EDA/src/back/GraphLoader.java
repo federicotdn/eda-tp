@@ -99,7 +99,7 @@ public class GraphLoader
 
 			int entryCount = Integer.valueOf(iterator.next());
 
-			edge.numberOfEntries = entryCount;
+			//edge.numberOfEntries = entryCount;
 
 			for (; entryCount > 0; entryCount--)
 			{

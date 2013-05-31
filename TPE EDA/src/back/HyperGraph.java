@@ -62,6 +62,7 @@ public class HyperGraph
 
 		public List<Node> tail = new ArrayList<Node>();
 		public List<Node> head = new ArrayList<Node>();
+		public List<HyperEdge> edgeParents = new ArrayList<HyperEdge>();
 
 		public boolean visited;
 
@@ -69,13 +70,11 @@ public class HyperGraph
 
 		public double distance;
 
-		public int numberOfEntries;
-
 		public HyperEdge(String name, double weight)
 		{
 			this.name = name;
 			this.weight = weight;
-			this.numberOfEntries = numberOfEntries;
+			visited = false;
 		}
 		
 		@Override
@@ -99,7 +98,28 @@ public class HyperGraph
 
 		exactAlgorithm(aux);
 		
+		//Marcar el camino (quizas este mal hecho), y agregar los nodos a un set (mal)
+		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
+		markPath(aux, path);
+		
+		//Medir el peso total (mal)
+		double total = 0;
+		for (HyperEdge e : path)
+			total += e.weight;
+		
+		System.out.println("Peso real del camino es: " + total); //imprimir peso real
+		
 		return aux.distance;
+	}
+
+	
+	private void markPath(HyperEdge edge, HashSet<HyperEdge> path)
+	{
+		edge.visited = true;
+		path.add(edge);
+		
+		for (HyperEdge parent : edge.edgeParents)
+			markPath(parent, path);
 	}
 	
 	//Variables globales de EXACT ALGORITHM despues las saco
@@ -177,6 +197,10 @@ public class HyperGraph
 		combinaciones = 0; //debuggear parentCombinations, sacar despues
 
 		edge.distance = edge.weight + combinationWeight(result);
+		
+		//Si se hace un hashset global no es necesario el clear
+		edge.edgeParents.clear();
+		edge.edgeParents.addAll(result);
 		
 		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}

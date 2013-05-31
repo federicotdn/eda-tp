@@ -9,9 +9,12 @@ public class Testing
 	{
 		HyperGraph g = GraphLoader.loadGraph("B.hg");
 		
+		GraphSaver.toDOT(g);
+		
 		System.out.println("Camino minimo pesa: " + g.exactAlgorithm());
 		System.out.println("Visitados: " + g.visited.size());
 		
+		g.name = g.name + "Solved";
 		GraphSaver.toDOT(g);
 	}
 }
