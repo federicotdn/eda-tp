@@ -27,10 +27,9 @@ public class GraphSaver
 
 		for (HyperEdge hEdge : hGraph.hEdges)
 		{
-			if (!hEdge.visited)
-				writer.write("\"" + hEdge.name + "\"[shape=box, height=0.18, fontsize=12, label=\""	+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
-			else
-				writer.write("\"" + hEdge.name + "\"[color=red shape=box, height=0.18, fontsize=12, label=\""	+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
+			writer.write("\"" + hEdge.name
+					+ "\"[shape=box, height=0.18, fontsize=12, label=\""
+					+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
 			writer.newLine();
 
 			for (Node node : hEdge.head)
