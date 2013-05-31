@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
@@ -83,15 +82,20 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					//graph.nodes.put(aux.name, aux);
+					graph.nodes.add(aux);
 				}
 
 				edge.head.add(aux);
 			}
+			
+			for (Node node : edge.head)
+			{
+				node.tail.add(edge);
+			}
 
 			int entryCount = Integer.valueOf(iterator.next());
 
-			//edge.setNumberOfEntries(entryCount);
+			edge.numberOfEntries = entryCount;
 
 			for (; entryCount > 0; entryCount--)
 			{
@@ -104,15 +108,18 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					//graph.nodes.put(aux.name, aux);
+					graph.nodes.add( aux);
 				}
 
 				edge.tail.add(aux);
 			}
 
-			edge.prepareParentNodes();
+			for (Node node : edge.tail)
+			{
+				node.head.add(edge);
+			}
 
-			graph.hEdges.put(edge.name, edge);
+			graph.hEdges.add(edge);
 		}
 
 		return graph;

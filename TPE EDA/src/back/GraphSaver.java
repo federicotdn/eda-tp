@@ -15,18 +15,17 @@ public class GraphSaver
 
 		FileWriter fileOutput = new FileWriter(hGraph.name + ".dot");
 		BufferedWriter writer = new BufferedWriter(fileOutput);
-		int i = 0;
-		writer.write("digraph  {".toCharArray());
+		writer.write("digraph  {");
 		writer.newLine();
 
-		for (Node node : hGraph.nodes.values())
+		for (Node node : hGraph.nodes)
 		{
 			writer.write("\"" + node.name + "\"[label=\"" + node.name + "\"];");
 			writer.newLine();
 
 		}
 
-		for (HyperEdge hEdge : hGraph.hEdges.values())
+		for (HyperEdge hEdge : hGraph.hEdges)
 		{
 			writer.write("\"" + hEdge.name
 					+ "\"[shape=box, height=0.18, fontsize=12, label=\""
@@ -50,7 +49,7 @@ public class GraphSaver
 		System.out.println("Archivo creado: " + hGraph.name + ".dot");
 	}
 
-	public static void toDOT(HyperGraph hGraph, HyperGraph subgraph)
+	/*public static void toDOT(HyperGraph hGraph, HyperGraph subgraph)
 			throws IOException
 	{
 
@@ -132,19 +131,19 @@ public class GraphSaver
 		FileWriter fileOutput = new FileWriter(hGraph.name + ".txt");
 		BufferedWriter writer = new BufferedWriter(fileOutput);
 
-		for (Node node : hGraph.nodes.values())
+		for (Node node : hGraph.nodes)
 		{
 			writer.write("nodo:     " + node.name);
 			writer.newLine();
 
-			for (HyperEdge edge : node.destinationEdges)
+			for (HyperEdge edge : node.head)
 			{
 				writer.write("\t" + edge.name);
 				writer.newLine();
 			}
 		}
 
-		for (HyperEdge edge : hGraph.hEdges.values())
+		for (HyperEdge edge : hGraph.hEdges)
 		{
 			writer.write("Hiper eje: " + edge.name);
 			writer.newLine();
@@ -171,4 +170,5 @@ public class GraphSaver
 
 		writer.close();
 	}
+	*/
 }
