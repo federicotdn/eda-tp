@@ -3,6 +3,7 @@ package back;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -61,14 +62,14 @@ public class AltGraph
 
 		exactAlgorithm(aux);
 		
-		//Marcar el camino (quizas este mal hecho), y agregar los nodos a un set (mal)
-		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
-		markPath(aux, path);
-		
-		//Medir el peso total (mal)
-		double total = 0;
-		for (HyperEdge e : path)
-			total += e.weight;
+//		//Marcar el camino (quizas este mal hecho), y agregar los nodos a un set (mal)
+//		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
+//		markPath(aux, path);
+//		
+//		//Medir el peso total (mal)
+//		double total = 0;
+//		for (HyperEdge e : path)
+//			total += e.weight;
 		
 		System.out.println("EXAL termino.");
 		System.out.println("Tardó: " + (System.currentTimeMillis() - time) + " milisegundos.");
@@ -76,40 +77,40 @@ public class AltGraph
 		System.out.println("Se visitaron: " + totalejes + " ejes");
 		System.out.println("Se calcularon: " + totalcombinaciones + " combinaciones");
 		
-		System.out.println("Peso real del camino es: " + total); //imprimir peso real
+		System.out.println("Peso real del camino es: " + aux.path.distance()); //imprimir peso real
 		
 		return aux.distance;
 	}
 
 	
-	private void markPath(HyperEdge edge, HashSet<HyperEdge> path) //auxlilar, sacar
-	{
-		edge.visited = true;
-		path.add(edge);
-		
-		for (HyperEdge parent : edge.edgeParents)
-			markPath(parent, path);
-	}
-	
-	private double calculatePath(HyperEdge edge) //auxiliar, sacar
-	{
-		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
-		
-		fillPath(edge, path);
-		
-		double total = 0;
-		for (HyperEdge e : path)
-			total += e.weight;
-		return total;
-	}
-	
-	private void fillPath(HyperEdge edge, HashSet<HyperEdge> path) //auxiliar, sacar
-	{
-		path.add(edge);
-		
-		for (HyperEdge parent : edge.edgeParents)
-			fillPath(parent, path);
-	}
+//	private void markPath(HyperEdge edge, HashSet<HyperEdge> path) //auxlilar, sacar
+//	{
+//		edge.visited = true;
+//		path.add(edge);
+//		
+//		for (HyperEdge parent : edge.edgeParents)
+//			markPath(parent, path);
+//	}
+//	
+//	private double calculatePath(HyperEdge edge) //auxiliar, sacar
+//	{
+//		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
+//		
+//		fillPath(edge, path);
+//		
+//		double total = 0;
+//		for (HyperEdge e : path)
+//			total += e.weight;
+//		return total;
+//	}
+//	
+//	private void fillPath(HyperEdge edge, HashSet<HyperEdge> path) //auxiliar, sacar
+//	{
+//		path.add(edge);
+//		
+//		for (HyperEdge parent : edge.edgeParents)
+//			fillPath(parent, path);
+//	}
 	
 	
 	//Variables globales de EXACT ALGORITHM despues las saco
@@ -141,7 +142,8 @@ public class AltGraph
 			if (aux.tail.isEmpty())
 			{
 				//System.out.println("Llegue al nodo inicio.");
-				edge.distance = edge.weight;
+				//edge.distance = edge.weight;
+				edge.path = new EdgePath(edge); //path inicial solo tiene un eje
 				return;
 			}
 
@@ -198,7 +200,21 @@ public class AltGraph
 		//edge.edgeParents.clear();
 		edge.edgeParents.addAll(result);
 		
-		edge.distance = calculatePath(edge); //se calcula el peso recursivamente en cada paso (hiper pesado)
+		//edge.distance = calculatePath(edge); //se calcula el peso recursivamente en cada paso (hiper pesado)
+		
+		//Version mejorada con path:
+		
+		Iterator<HyperEdge> it = result.iterator();
+		
+		//Si el resultado solo tiene un Eje, entonces copio su camino
+		edge.path = it.next().path;
+		
+		//Mergeo con el resto de los Ejes padres (si hay)
+		while (it.hasNext())
+			edge.path.mergeWith(it.next().path);
+		
+		//Me agrego a mi mismo al camino
+		edge.path.addEdge(edge);
 		
 		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}
@@ -252,33 +268,7 @@ public class AltGraph
 	{
 		float sum = 0;
 		for (HyperEdge e : comb)
-			sum += e.distance;
+			sum += e.path.distance();
 		return sum;
-	}
-
-	// Alt algorithm abajo
-
-	public void exactAlgorithmAlt()
-	{
-		Map<String, HyperEdge> calculated = new HashMap<String, HyperEdge>();
-
-		HyperEdge imag = new HyperEdge("Imaginary", 0);
-		imag.tail.add(end);
-
-		exactAlgorithmAlt(imag, calculated);
-	}
-
-	private void exactAlgorithmAlt(HyperEdge hEdge,
-			Map<String, HyperEdge> calculated)
-	{
-
-		for (Node node : hEdge.tail)
-		{
-			for (HyperEdge edge : node.tail)
-			{
-				edge.distance = edge.weight + hEdge.distance;
-			}
-		}
-
 	}
 }

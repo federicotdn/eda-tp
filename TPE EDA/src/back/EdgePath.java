@@ -13,8 +13,14 @@ public class EdgePath implements Iterable<HyperEdge>
 	public EdgePath(HyperEdge initial)
 	{
 		path = new HashSet<HyperEdge>();
-		path.add(initial);
-		totalWeight = initial.weight;
+		totalWeight = 0;
+		addEdge(initial);
+	}
+	
+	public void addEdge(HyperEdge edge)
+	{
+		if (path.add(edge))
+			totalWeight += edge.weight;
 	}
 	
 	public void mergeWith(EdgePath other)
@@ -24,6 +30,11 @@ public class EdgePath implements Iterable<HyperEdge>
 			if (path.add(edge))
 				totalWeight += edge.weight;
 		}
+	}
+	
+	public double distance()
+	{
+		return totalWeight;
 	}
 
 	@Override
