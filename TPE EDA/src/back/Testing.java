@@ -7,15 +7,16 @@ public class Testing
 {
 	public static void main(String[] args) throws FileNotFoundException, IOException
 	{
-		HyperGraph g = GraphLoader.loadGraph("F.hg");
-		HyperGraph g2 = GraphLoader.loadGraph("F.hg");
+		HyperGraph g = GraphLoader.loadGraph("B.hg");
+		HyperGraph g2 = GraphLoader.loadGraph("B.hg");
 		
 		AltGraph a = new AltGraph(g);
 		AltCombGraph b = new AltCombGraph(g2);
 	
 		a.exactAlgorithm();
+		System.out.println();
 		b.exactAlgorithm();
-		
+		System.out.println();
 		//GraphSaver.toDOT(g);
 		
 		g.name = g.name + "Solved";

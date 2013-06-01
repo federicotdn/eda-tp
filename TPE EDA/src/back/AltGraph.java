@@ -74,9 +74,9 @@ public class AltGraph
 		System.out.println("EXAL termino.");
 		System.out.println("Tardó: " + (System.currentTimeMillis() - time) + " milisegundos.");
 		
-		System.out.println("Se visitaron: " + totalejes + " ejes");
-		System.out.println("Se calcularon: " + totalcombinaciones + " combinaciones");
-		
+//		System.out.println("Se visitaron: " + totalejes + " ejes");
+//		System.out.println("Se calcularon: " + totalcombinaciones + " combinaciones");
+//		
 		System.out.println("Peso real del camino es: " + aux.path.distance()); //imprimir peso real
 		
 		return aux.distance;

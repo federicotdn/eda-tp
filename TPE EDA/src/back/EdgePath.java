@@ -42,6 +42,12 @@ public class EdgePath implements Iterable<HyperEdge>
 	{
 		return totalWeight;
 	}
+	
+	public void markPath()
+	{
+		for (HyperEdge edge : path)
+			edge.visited = true;
+	}
 
 	@Override
 	public Iterator<HyperEdge> iterator()
