@@ -61,6 +61,7 @@ public class AltCombGraph
 		aux.tail.add(end);
 
 		exactAlgorithm(aux);
+		aux.path.markPath();
 		
 		System.out.println("EXAL termino.");
 		System.out.println("Tardó: " + (System.currentTimeMillis() - time) + " milisegundos.");
