@@ -136,6 +136,8 @@ public class AltGraph
 		
 		//DEBUG end
 		
+		edge.path = new EdgePath(edge);
+		
 		if (edge.tail.size() == 1)
 		{
 			Node aux = edge.tail.get(0);
@@ -143,7 +145,7 @@ public class AltGraph
 			{
 				//System.out.println("Llegue al nodo inicio.");
 				//edge.distance = edge.weight;
-				edge.path = new EdgePath(edge); //path inicial solo tiene un eje
+				//edge.path = new EdgePath(edge); //path inicial solo tiene un eje
 				return;
 			}
 
@@ -176,6 +178,8 @@ public class AltGraph
 			parents.add(node.tail);
 			cantidadComb *= node.tail.size(); //debuggear parentCombinations, sacar despues
 		}
+		
+		resultWeight = 0;
 
 		parentCombinations(parents, 0, combination, result);
 		
@@ -206,15 +210,19 @@ public class AltGraph
 		
 		Iterator<HyperEdge> it = result.iterator();
 		
-		//Si el resultado solo tiene un Eje, entonces copio su camino
-		edge.path = it.next().path;
+//		//Si el resultado solo tiene un Eje, entonces copio su camino
+//		edge.path = it.next().path;
+//		
+//		//Mergeo con el resto de los Ejes padres (si hay)
+//		while (it.hasNext())
+//			edge.path.mergeWith(it.next().path);
+//		
+//		//Me agrego a mi mismo al camino
+//		edge.path.addEdge(edge);
+	
 		
-		//Mergeo con el resto de los Ejes padres (si hay)
-		while (it.hasNext())
-			edge.path.mergeWith(it.next().path);
-		
-		//Me agrego a mi mismo al camino
-		edge.path.addEdge(edge);
+		for (HyperEdge parent : result)
+			edge.path.mergeWith(parent.path);
 		
 		//System.out.println("Distancia acumulada es: " + edge.distance);
 	}
