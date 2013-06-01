@@ -23,5 +23,8 @@ public class Testing
 		g2.name = g2.name + "CombSolved";
 		GraphSaver.toDOTwithPath(g);
 		GraphSaver.toDOTwithPath(g2);
+		
+		GraphSaver.toDOTpathOnly(g);
+		GraphSaver.toDOTpathOnly(g2);
 	}
 }

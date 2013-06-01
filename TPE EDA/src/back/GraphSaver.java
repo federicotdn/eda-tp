@@ -135,6 +135,89 @@ public class GraphSaver
 		System.out.println("Archivo creado: " + hGraph.name + ".dot");
 	}
 
+	public static void toDOTpathOnly(HyperGraph g) throws IOException
+	{//hecho MUY asi nomas
+		FileWriter fileOutput = new FileWriter(g.name + "Subgraph.dot");
+		BufferedWriter writer = new BufferedWriter(fileOutput);
+		writer.write("digraph  {");
+		writer.newLine();
+		
+		HashSet<Node> pathNodes = new HashSet<Node>();
+		
+		Node start = g.getStart();
+		Node end = g.getEnd();
+		
+		pathNodes.add(end);
+		
+		writer.write("\"" + start.name + "\"[color=red label=\"" + start.name + "\"];");
+		writer.newLine();
+		writer.write("\"" + end.name + "\"[color=red label=\"" + end.name + "\"];");
+		writer.newLine();
+		
+		for (HyperEdge edge : g.hEdges)
+		{
+			if (edge.visited)
+				pathNodes.addAll(edge.tail);
+		}
+		
+		for (Node node : g.nodes)
+		{
+			if (!pathNodes.contains(node))
+				;//writer.write("\"" + node.name + "\"[label=\"" + node.name + "\"];");
+			else
+				writer.write("\"" + node.name + "\"[label=\"" + node.name + "\"];");
+			writer.newLine();
+
+		}
+
+		for (HyperEdge hEdge : g.hEdges)
+		{
+			if (!hEdge.visited)
+			{
+//				writer.write("\"" + hEdge.name
+//						+ "\"[shape=box, height=0.18, fontsize=12, label=\""
+//						+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
+//				writer.newLine();
+//	
+//				for (Node node : hEdge.head)
+//				{
+//					writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\";");
+//					writer.newLine();
+//				}
+//				for (Node node : hEdge.tail)
+//				{
+//					writer.write("\"" + node.name + "\"->\"" + hEdge.name + "\";");
+//					writer.newLine();
+//				}
+			}
+			else
+			{
+				writer.write("\"" + hEdge.name
+						+ "\"[shape=box, height=0.18, fontsize=12, label=\""
+						+ hEdge.name + " ( " + hEdge.weight + " )" + "\"];");
+				writer.newLine();
+				
+				for (Node node : hEdge.tail)
+				{
+					writer.write("\"" + node.name + "\"->\"" + hEdge.name + "\"[style=bold];");
+					writer.newLine();
+				}
+				
+				for (Node node : hEdge.head)
+				{
+					if (!pathNodes.contains(node))					
+						;//writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\";");
+					else
+						writer.write("\"" + hEdge.name + "\"->\"" + node.name + "\"[style=bold];");
+					writer.newLine();
+				}
+			}
+		}
+
+		writer.write("}");
+		writer.close();
+		System.out.println("Archivo creado: " + g.name + "Subgraph.dot");
+	}
 	/*public static void toDOT(HyperGraph hGraph, HyperGraph subgraph)
 			throws IOException
 	{
