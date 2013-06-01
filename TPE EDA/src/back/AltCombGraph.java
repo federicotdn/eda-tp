@@ -10,7 +10,7 @@ import java.util.Map;
 import back.HyperGraph.HyperEdge;
 import back.HyperGraph.Node;
 
-public class AltGraph
+public class AltCombGraph
 {
 
 	public String name;
@@ -23,7 +23,7 @@ public class AltGraph
 	List<HyperEdge> hEdges;
 	List<Node> nodes;
 
-	public AltGraph(Node start, Node end)
+	public AltCombGraph(Node start, Node end)
 	{
 		this.start = start;
 		this.end = end;
@@ -31,7 +31,7 @@ public class AltGraph
 		nodes = new ArrayList<Node>();
 	}
 	
-	public AltGraph(HyperGraph graph)
+	public AltCombGraph(HyperGraph graph)
 	{
 		this.start = graph.getStart();
 		this.end = graph.getEnd();
@@ -266,13 +266,28 @@ public class AltGraph
 			for (HyperEdge edge : combination)
 				tempResult.add(edge);
 			
-			float tempResultWeight = combinationWeight(tempResult);
-
-			if (tempResultWeight < resultWeight || result.isEmpty())
+//			float tempResultWeight = combinationWeight(tempResult);
+//
+//			if (tempResultWeight < resultWeight || result.isEmpty())
+//			{
+//				result.clear();
+//				result.addAll(tempResult);
+//				resultWeight = tempResultWeight;
+//			}
+			
+			EdgePath temp = new EdgePath();
+			EdgePath ans = new EdgePath();
+			
+			for (HyperEdge e : tempResult)
+				temp.mergeWith(e.path);
+			
+			for (HyperEdge e : result)
+				ans.mergeWith(e.path);
+			
+			if (temp.distance() < ans.distance() || result.isEmpty())
 			{
 				result.clear();
 				result.addAll(tempResult);
-				resultWeight = tempResultWeight;
 			}
 			
 			totalcombinaciones++; //sacar
