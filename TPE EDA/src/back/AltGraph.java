@@ -121,6 +121,7 @@ public class AltGraph
 	
 	int totalcombinaciones = 0;
 	int totalejes = 0;
+	int lastPercentage = 0;
 	
 	HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); 
 	
@@ -133,6 +134,14 @@ public class AltGraph
 		
 		visited.add(edge);
 		totalejes++;
+		
+		int percentage = (int)((float)(totalejes)*100/(this.hEdges.size()));
+		
+		if (percentage != lastPercentage)
+		{	
+			System.out.println("Completado: " + percentage + "%");
+			lastPercentage = percentage;
+		}
 		
 		//DEBUG end
 		
