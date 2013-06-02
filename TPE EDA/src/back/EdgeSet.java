@@ -23,11 +23,16 @@ public class EdgeSet implements Iterable<HyperEdge>
 		this.edges = new HashSet<HyperEdge>();
 		for (HyperEdge e : edges)
 		{
-			totalWeight += e.weight;
-			this.edges.add(e);
+			if (this.edges.add(e))
+			{
+				this.totalWeight += e.weight;
+			}
+
 		}
 	}
-	public EdgeSet(HyperEdge edge){
+
+	public EdgeSet(HyperEdge edge)
+	{
 		HashSet<HyperEdge> aux = new HashSet<HyperEdge>();
 		aux.add(edge);
 		this.edges = aux;
@@ -77,7 +82,7 @@ public class EdgeSet implements Iterable<HyperEdge>
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String toString()
 	{
