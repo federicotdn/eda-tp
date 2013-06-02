@@ -77,5 +77,11 @@ public class EdgeSet implements Iterable<HyperEdge>
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return edges.toString() + " " + totalWeight;
+	}
 
 }
