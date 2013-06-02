@@ -10,7 +10,7 @@ import back.HyperGraph.Node;
 
 public class EdgeSet implements Iterable<HyperEdge>
 {
-	private HashSet<HyperEdge> edges;
+	public HashSet<HyperEdge> edges;
 	private double totalWeight;
 	private EdgeSet parent;
 

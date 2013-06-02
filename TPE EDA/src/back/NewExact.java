@@ -3,6 +3,7 @@ package back;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +72,8 @@ public class NewExact
 				+ (System.currentTimeMillis() - time));
 	}
 
+	public HashMap<HashSet<HyperEdge>, EdgeSet> visited = new HashMap<HashSet<HyperEdge>, EdgeSet>();
+	
 	public void exal(EdgeSet edgesSet)
 	{
 
@@ -101,7 +104,15 @@ public class NewExact
 
 		for (EdgeSet combination : combinations)
 		{
-			exal(combination);
+			if (!visited.containsKey(combination.edges))
+			{
+				visited.put(combination.edges, combination);
+				exal(combination);
+			}
+			else
+				combination = visited.get(combination.edges);
+			
+			
 			if (min == null
 					|| (combination.getTotalWeight() < min.getTotalWeight()))
 			{
@@ -184,46 +195,46 @@ public class NewExact
 	public static void main(String[] args) throws FileNotFoundException,
 			IOException
 	{
-//		HyperGraph g = GraphLoader.loadGraph("B.hg");
-//
-//		NewExact a = new NewExact(g);
-//		a.exal();
+		HyperGraph g = GraphLoader.loadGraph("B.hg");
+
+		NewExact a = new NewExact(g);
+		a.exal();
 		
-		Node start = new Node("Start");
-		Node end = new Node("End");
-		
-		Node t = new Node("T");
-		Node s = new Node("S");
-		Node u = new Node("U");
-		Node w = new Node("W");
-		
-		HyperEdge p = new HyperEdge("P", 8.0);
-		HyperEdge q = new HyperEdge("Q", 6.0);
-		HyperEdge r = new HyperEdge("R", 9.0);
-		
-		t.tail.add(p);
-		s.tail.add(p);
-		u.tail.add(p);
-		
-		w.tail.add(q);
-		w.tail.add(r);
-		
-		NewExact g = new NewExact(start, end);
-		
-		HashSet<Node> set = new HashSet<Node>();
-		set.add(t);
-		set.add(u);
-		set.add(s);
-		set.add(w);
-		
-		
-		ArrayList<EdgeSet> comb = new ArrayList<EdgeSet>();
-		
-		g.edgesCombinations(set, set.iterator(), comb, 0);
-		
-		for(EdgeSet e: comb){
-			System.out.println(e);
-		}
+//		Node start = new Node("Start");
+//		Node end = new Node("End");
+//		
+//		Node t = new Node("T");
+//		Node s = new Node("S");
+//		Node u = new Node("U");
+//		Node w = new Node("W");
+//		
+//		HyperEdge p = new HyperEdge("P", 8.0);
+//		HyperEdge q = new HyperEdge("Q", 6.0);
+//		HyperEdge r = new HyperEdge("R", 9.0);
+//		
+//		t.tail.add(p);
+//		s.tail.add(p);
+//		u.tail.add(p);
+//		
+//		w.tail.add(q);
+//		w.tail.add(r);
+//		
+//		NewExact g = new NewExact(start, end);
+//		
+//		HashSet<Node> set = new HashSet<Node>();
+//		set.add(t);
+//		set.add(u);
+//		set.add(s);
+//		set.add(w);
+//		
+//		
+//		ArrayList<EdgeSet> comb = new ArrayList<EdgeSet>();
+//		
+//		g.edgesCombinations(set, set.iterator(), comb, 0);
+//		
+//		for(EdgeSet e: comb){
+//			System.out.println(e);
+//		}
 		
 
 		
