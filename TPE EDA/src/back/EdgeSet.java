@@ -1,5 +1,6 @@
 package back;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,11 @@ public class EdgeSet implements Iterable<HyperEdge>
 	public EdgeSet(HashSet<HyperEdge> edges)
 	{
 		this.edges = edges;
+	}
+	
+	public EdgeSet()
+	{
+		this.edges = new HashSet<HyperEdge>();
 	}
 
 	public EdgeSet(HyperEdge[] edges)
@@ -87,6 +93,25 @@ public class EdgeSet implements Iterable<HyperEdge>
 	public String toString()
 	{
 		return edges.toString() + " " + totalWeight;
+	}
+	
+	public boolean contains(HyperEdge edge){
+		return edges.contains(edge);
+	}
+	
+	public boolean add(HyperEdge edge){
+		return edges.add(edge);
+	}
+	
+	public  EdgeSet(EdgeSet set){
+			this.edges = new HashSet<HyperEdge>();
+
+			this.edges.addAll(set.edges);
+		
+	}
+	
+	public int size(){
+		return edges.size();
 	}
 
 }

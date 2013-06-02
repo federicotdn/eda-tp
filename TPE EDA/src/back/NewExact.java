@@ -55,21 +55,21 @@ public class NewExact
 		System.out.println("Comenzando EXAL");
 		long time = System.currentTimeMillis();
 		EdgeSet min = null;
-		for(HyperEdge edge: end.tail){
+		for (HyperEdge edge : end.tail)
+		{
 			EdgeSet aux = new EdgeSet(edge);
 			exal(aux);
-			if (min == null
-					|| (aux.getTotalWeight() < min.getTotalWeight()))
+			if (min == null || (aux.getTotalWeight() < min.getTotalWeight()))
 			{
 				min = aux;
 			}
-			
-		}
-		
-		System.out.println(min.getTotalWeight());
-		System.out.println("Tiempo total  " + (System.currentTimeMillis() - time));
-	}
 
+		}
+
+		System.out.println(min.getTotalWeight());
+		System.out.println("Tiempo total  "
+				+ (System.currentTimeMillis() - time));
+	}
 
 	public void exal(EdgeSet edgesSet)
 	{
@@ -108,7 +108,7 @@ public class NewExact
 				min = combination;
 			}
 		}
-		
+
 		edgesSet.setParent(min);
 
 	}
@@ -134,48 +134,102 @@ public class NewExact
 		}
 	}
 
-	public void edgesCombinations(ArrayList<Node> nodes, int index,
-			ArrayList<HashSet<HyperEdge>> combinations, Iterator<Node> it,
-			HashSet<HyperEdge> aux)
-	{
+	public void edgesCombinations(HashSet<Node> nodes, Iterator<Node> it,
+			ArrayList<EdgeSet> combinations, int index)
 
-		if (!it.hasNext())
-		{
-			return;
-		}
+	{
+		
+		
 
 		while (it.hasNext())
 		{
 			Node node = it.next();
+			EdgeSet currentComb;
+			if(combinations.size() == 0){
+				currentComb = new EdgeSet();
+				combinations.add(currentComb);
+				
+			}else{
+				currentComb = combinations.get(index);
+			}
+			
+
+
 			boolean isSatisfied = false;
-			for (HyperEdge parent : node.tail)
+			for (HyperEdge e : node.tail)
 			{
-				if (aux.contains(parent))
+				if (currentComb.contains(e))
 				{
 					isSatisfied = true;
 				}
 			}
 			if (!isSatisfied)
 			{
-				for (HyperEdge e : node.tail)
+				for (HyperEdge edge : node.tail)
 				{
-					aux.add(e);
+					if(node.tail.size() == 1){
+						currentComb.add(edge);
+					}
+					EdgeSet aux = new EdgeSet(currentComb);
+					currentComb.add(edge);
 					combinations.add(aux);
-					edgesCombinations(nodes, index, combinations, it, aux);
-					HashSet<HyperEdge> set = new HashSet<HyperEdge>(aux);
-
+					edgesCombinations(nodes, it, combinations, index + 1);
 				}
-			}
 
+			}
 		}
 
 	}
 
-	public static void main(String[] args) throws FileNotFoundException, IOException
+	public static void main(String[] args) throws FileNotFoundException,
+			IOException
 	{
-		HyperGraph g = GraphLoader.loadGraph("B.hg");
+//		HyperGraph g = GraphLoader.loadGraph("B.hg");
+//
+//		NewExact a = new NewExact(g);
+//		a.exal();
 		
-		NewExact a = new NewExact(g);
-		a.exal();
+		Node start = new Node("Start");
+		Node end = new Node("End");
+		
+		Node t = new Node("T");
+		Node s = new Node("S");
+		Node u = new Node("U");
+		Node w = new Node("W");
+		
+		HyperEdge p = new HyperEdge("P", 8.0);
+		HyperEdge q = new HyperEdge("Q", 6.0);
+		HyperEdge r = new HyperEdge("R", 9.0);
+		
+		t.tail.add(p);
+		s.tail.add(p);
+		u.tail.add(p);
+		
+		w.tail.add(q);
+		w.tail.add(r);
+		
+		NewExact g = new NewExact(start, end);
+		
+		HashSet<Node> set = new HashSet<Node>();
+		set.add(t);
+		set.add(u);
+		set.add(s);
+		set.add(w);
+		
+		
+		ArrayList<EdgeSet> comb = new ArrayList<EdgeSet>();
+		
+		g.edgesCombinations(set, set.iterator(), comb, 0);
+		
+		for(EdgeSet e: comb){
+			System.out.println(e);
+		}
+		
+
+		
+
+		
+		
+		
 	}
 }
