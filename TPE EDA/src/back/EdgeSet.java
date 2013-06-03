@@ -47,8 +47,11 @@ public class EdgeSet implements Iterable<HyperEdge>
 
 	public void setParent(EdgeSet parent)
 	{
+		if(parent != null){
+			totalWeight += parent.totalWeight;
+
+		}
 		this.parent = parent;
-		totalWeight += parent.totalWeight;
 	}
 
 	@Override
@@ -100,18 +103,44 @@ public class EdgeSet implements Iterable<HyperEdge>
 	}
 	
 	public boolean add(HyperEdge edge){
-		return edges.add(edge);
+		boolean aux = edges.add(edge);
+		if(aux){
+			totalWeight += edge.weight;
+		}
+		return aux;
 	}
 	
 	public  EdgeSet(EdgeSet set){
 			this.edges = new HashSet<HyperEdge>();
-
 			this.edges.addAll(set.edges);
-		
+			this.totalWeight = set.totalWeight;
 	}
 	
 	public int size(){
 		return edges.size();
 	}
+	
+	public void setEdges(EdgeSet set){
+		this.edges = set.edges;
+		this.totalWeight = set.totalWeight;
+	}
+	
+	public EdgeSet getParent(){
+		return parent;
+	}
+	
+	public boolean isEmpty(){
+		return edges.isEmpty();
+	}
+	
+	public void addBase(HashSet<HyperEdge> base){
+		for(HyperEdge edge: base){
+			if(this.edges.add(edge)){
+				this.totalWeight += edge.weight;
+			}
+		}
+	}
+	
+	
 
 }

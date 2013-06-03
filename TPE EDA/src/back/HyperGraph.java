@@ -104,11 +104,17 @@ public class HyperGraph
 			return "[" + name + ", " + weight + "]";
 		}
 		
-		@Override
-		public int hashCode()
+		public void setChildrenVisited()
 		{
-			return name.hashCode();
+			for (Node node : head)
+				node.visited = true;
 		}
+		
+//		@Override
+//		public int hashCode()
+//		{
+//			return name.hashCode();
+//		}
 	}
 
 	public double exactAlgorithm()
