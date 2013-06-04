@@ -13,6 +13,8 @@ public class EdgeSet implements Iterable<HyperEdge>
 	public HashSet<HyperEdge> edges;
 	private double totalWeight;
 	private EdgeSet parent;
+	private EdgeSet child;
+	
 
 	public EdgeSet(HashSet<HyperEdge> edges)
 	{
@@ -52,6 +54,15 @@ public class EdgeSet implements Iterable<HyperEdge>
 
 		}
 		this.parent = parent;
+	}
+	
+	public void setChild(EdgeSet child)
+	{
+		if(child != null){
+			this.totalWeight += child.totalWeight;
+
+		}
+		this.child = child;
 	}
 
 	@Override
@@ -139,6 +150,15 @@ public class EdgeSet implements Iterable<HyperEdge>
 				this.totalWeight += edge.weight;
 			}
 		}
+	}
+	
+	public HashSet<HyperEdge> getEdges(){
+		return edges;
+	}
+	
+	public void removeChild(){
+		this.totalWeight = this.totalWeight - child.totalWeight;
+		this.child = null;
 	}
 	
 	
