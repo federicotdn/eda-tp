@@ -26,9 +26,8 @@ public class EdgeSet implements Iterable<HyperEdge>
 
 	public EdgeSet(HyperEdge edge)
 	{
-		HashSet<HyperEdge> aux = new HashSet<HyperEdge>();
-		aux.add(edge);
-		this.edges = aux;
+		edges = new HashSet<HyperEdge>();
+		edges.add(edge);
 		totalWeight = edge.weight();
 	}
 
@@ -83,23 +82,7 @@ public class EdgeSet implements Iterable<HyperEdge>
 	{
 		return edges.toString() + " " + totalWeight;
 	}
-	
-//	public boolean add(HyperEdge edge){
-//		boolean aux = edges.add(edge);
-//		if(aux){
-//			totalWeight += edge.weight();
-//		}
-//		return aux;
-//	}
-	
-//	public EdgeSet getParent()
-//	{
-//		return parent;
-//	}
-	
-//	public boolean isEmpty(){
-//		return edges.isEmpty();
-//	}
+
 	
 	public void addBase(HashSet<HyperEdge> base)
 	{

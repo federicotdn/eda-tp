@@ -22,9 +22,6 @@ public class GraphLoader
 
 	final static int minTagLength = 1, maxTagLength = 10;
 	final static int minTagsPerLine = 6;
-	
-	
-	
 
 	static public HyperGraph loadGraph(String filename) throws IOException,
 			FileNotFoundException
@@ -37,35 +34,26 @@ public class GraphLoader
 
 		String graphName = filename.substring(0, filename.length() - 3);
 
-		String line;
 		LinkedList<String> lineTags;
 
 		HashMap<String, Node> nodes = new HashMap<String, Node>();
 
-		Node start = null;
-		Node end = null;
-		
+		Node start = null, end = null;
+
 		int linesRead = 0;
-		
+
 		while (reader.ready() && linesRead != 2)
 		{
-			line = reader.readLine();
-			
-			if (line.startsWith("#"))
-				continue;
-			
+			String line = reader.readLine();
+
+			if (line.startsWith("#")) continue;
+
 			linesRead++;
 			
-			switch (linesRead)
-			{
-				case 1:
-					start = new Node(parseSingleTagAlt(line)); //Cambiar a no-alt
-				break;
-					
-				case 2:
-					end = new Node(parseSingleTagAlt(line)); //idem
-				break;
-			}
+			if (linesRead == 1)
+				start = new Node(parseSingleTagAlt(line));
+			else if (linesRead == 2)
+				end = new Node(parseSingleTagAlt(line));
 		}
 
 		HyperGraph graph = new HyperGraph(graphName, start, end);
@@ -74,12 +62,11 @@ public class GraphLoader
 		nodes.put(end.getName(), end);
 
 		while (reader.ready())
-		{	
-			line = reader.readLine();
-			
-			if (line.startsWith("#"))
-				continue;
-			
+		{
+			String line = reader.readLine();
+
+			if (line.startsWith("#")) continue;
+
 			lineTags = parseMultipleTagsAlt(line);
 			Iterator<String> iterator = lineTags.iterator();
 
@@ -108,7 +95,7 @@ public class GraphLoader
 
 				edge.head().add(aux);
 			}
-			
+
 			for (Node node : edge.head())
 			{
 				node.tail().add(edge);
@@ -131,9 +118,8 @@ public class GraphLoader
 				}
 
 				edge.tail().add(aux);
-				
-				if (aux == start)
-					edge.setAsTop();
+
+				if (aux == start) edge.setAsTop();
 			}
 
 			for (Node node : edge.tail())
@@ -143,6 +129,8 @@ public class GraphLoader
 
 			graph.edges().add(edge);
 		}
+		
+		System.out.println("Grafo " + graphName + ".hg cargado.");
 
 		return graph;
 	}
@@ -211,12 +199,14 @@ public class GraphLoader
 		return tags;
 	}
 
-	private static String parseSingleTagAlt(String line) throws IOException //Borrar despues
+	private static String parseSingleTagAlt(String line) throws IOException // Borrar
+																			// despues
 	{
 		return line;
 	}
 
-	private static LinkedList<String> parseMultipleTagsAlt(String lineString) //Borrar despues
+	private static LinkedList<String> parseMultipleTagsAlt(String lineString) // Borrar
+																				// despues
 			throws IOException
 	{
 		LinkedList<String> list = new LinkedList<String>();
