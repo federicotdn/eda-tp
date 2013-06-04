@@ -31,22 +31,22 @@ public class HyperGraph
 		return start;
 	}
 
-
 	public Node end()
 	{
 		return end;
 	}
 	
-	//----------------Algoritmo Exacto---------------------------------------
-	
-	private boolean topEdge(HyperEdge edge) //Sacar, y poner flag en la clase HyperEdge
+	public List<HyperEdge> edges()
 	{
-		if (edge.tail.size() == 1)
-			if (edge.tail.get(0) == start)
-				return true;
-		
-		return false;
+		return hEdges;
 	}
+	
+	public List<Node> nodes()
+	{
+		return nodes;
+	}
+	
+	//----------------Algoritmo Exacto---------------------------------------
 	
 	public void minimumPathExact()
 	{
@@ -97,6 +97,11 @@ public class HyperGraph
 			return head;
 		}
 		
+		public String getName()
+		{
+			return name;
+		}
+		
 		public Node(String name)
 		{
 			this.name = name;
@@ -122,12 +127,12 @@ public class HyperGraph
 		
 		private final double weight;
 		
-		public HyperEdge(String name, double weight, boolean isTop)
+		public HyperEdge(String name, double weight)
 		{
 			this.name = name;
 			this.weight = weight;
 			visited = false;
-			this.isTop = isTop;
+			isTop = false;
 		}
 		
 		public ArrayList<Node> tail()
@@ -143,6 +148,11 @@ public class HyperGraph
 		public double weight()
 		{
 			return weight;
+		}
+		
+		public void setAsTop()
+		{
+			isTop = true;
 		}
 		
 		@Override
