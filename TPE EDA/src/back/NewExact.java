@@ -83,24 +83,30 @@ public class NewExact
 
 	public void exal(EdgeSet edgesSet)
 	{
+		System.out.println(edgesSet);
 
-		if (edgesSet.isTop())
-		{
-			return;
-		}
+//		if (edgesSet.isTop())
+//		{
+//			return;
+//		}
 		
-		if(minPath != null && edgesSet.getTotalWeight() > minPath.getTotalWeight()){
-			return;
-		}
+//		if(minPath != null && edgesSet.getTotalWeight() > minPath.getTotalWeight()){
+//			return;
+//		}
 
 		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
 
 		HashSet<Node> nodes = new HashSet<Node>();
+		
 		for (HyperEdge e : edgesSet)
 		{
-			nodes.addAll(e.tail);
+			if (!topEdge(e))
+				nodes.addAll(e.tail);
 
 		}
+		
+		if (nodes.size() == 0)
+			return;
 
 		HashSet<HyperEdge> added = new HashSet<HyperEdge>();
 		HyperEdge auxEdge;
@@ -213,6 +219,15 @@ public class NewExact
 
 		System.out.println(startingEdge.getTotalWeight());
 
+	}
+	
+	private boolean topEdge(HyperEdge edge) //Sacar, y poner flag en la clase HyperEdge
+	{
+		if (edge.tail.size() == 1)
+			if (edge.tail.get(0) == start)
+				return true;
+		
+		return false;
 	}
 
 	public void aprox(EdgeSet edgesSet)
@@ -365,12 +380,13 @@ public class NewExact
 	public static void main(String[] args) throws FileNotFoundException,
 			IOException
 	{
-		HyperGraph g = GraphLoader.loadGraph("generated4	.hg");
+		HyperGraph g = GraphLoader.loadGraph("Z.hg");
 
 		NewExact a = new NewExact(g);
 		// a.aprox();
 		a.exal();
 		
+		//GraphSaver.toDOT(g);
 
 		// Node start = new Node("Start");
 		// Node end = new Node("End");

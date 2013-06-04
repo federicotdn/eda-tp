@@ -39,6 +39,14 @@ public class HyperGraph
 	
 	//----------------Algoritmo Exacto---------------------------------------
 	
+	private boolean topEdge(HyperEdge edge) //Sacar, y poner flag en la clase HyperEdge
+	{
+		if (edge.tail.size() == 1)
+			if (edge.tail.get(0) == start)
+				return true;
+		
+		return false;
+	}
 	
 	public void minimumPathExact()
 	{
@@ -110,14 +118,16 @@ public class HyperGraph
 		private String name;
 		
 		private boolean visited;
+		private boolean isTop;
 		
 		private final double weight;
 		
-		public HyperEdge(String name, double weight)
+		public HyperEdge(String name, double weight, boolean isTop)
 		{
 			this.name = name;
 			this.weight = weight;
 			visited = false;
+			this.isTop = isTop;
 		}
 		
 		public ArrayList<Node> tail()
