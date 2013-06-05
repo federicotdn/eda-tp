@@ -3,16 +3,13 @@ package back;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import back.HyperGraphAlt.HyperEdge;
-import back.HyperGraphAlt.Node;
+
 
 public class HyperGraph
 {
@@ -23,6 +20,8 @@ public class HyperGraph
 	private Node end;
 
 	private double minDistance;
+	
+	private EdgeSet minPath;
 
 	List<HyperEdge> hEdges;
 	List<Node> nodes;
@@ -54,6 +53,8 @@ public class HyperGraph
 		public ArrayList<HyperEdge> tail;
 
 		public boolean visited;
+		private boolean isTop;
+
 
 		public int tempoParentCount;
 
@@ -221,6 +222,8 @@ public class HyperGraph
 		EdgeSet aux = new EdgeSet(hEdge);
 		
 		generateSet(aux);
+		
+		minPath = aux;
 
 		return aux.getTotalWeight();
 
@@ -313,5 +316,19 @@ public class HyperGraph
 		set.setParent(newSet);
 
 	}
+	
+	private void improvePath(){
+	
+		EdgeSet current = minPath;
+		
+		while(current.getParent() != null){
+			
+		}
+		
+		
+	}
+	
+
+	
 
 }
