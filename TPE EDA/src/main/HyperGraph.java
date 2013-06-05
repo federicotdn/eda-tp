@@ -1,9 +1,11 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 
 //Clase HyperGraph limpia, con implementacion de algoritmo exacto:
 //Usa la version con HashMap<Integer, EdgeSet>, llega recursivamente hasta arriba
@@ -119,12 +121,9 @@ public class HyperGraph
 		current.setParent(min);
 	}
 
-	private HashSet<EdgeSet> generateCombinations(HashSet<Node> nodes)
+	private ArrayList<ArrayList<HyperEdge>>  generateParents(HashSet<Node> nodes, HashSet<HyperEdge> base)
 	{
 		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
-
-		HashSet<HyperEdge> base = new HashSet<HyperEdge>();
-
 
 		for (Node node : nodes)
 		{
@@ -148,13 +147,7 @@ public class HyperGraph
 				node.visited = false;
 			}
 
-		HyperEdge[] aux = new HyperEdge[parents.size()];
-
-		HashSet<EdgeSet> combinations = new HashSet<EdgeSet>();
-
-		parentCombinations(parents, 0, aux, combinations, base);
-
-		return combinations;
+		return parents;
 	}
 
 	private HashSet<Node> getParentNodes(EdgeSet set)
@@ -169,6 +162,21 @@ public class HyperGraph
 			}
 		}
 		return nodes;
+	}
+	
+	private HashSet<EdgeSet> generateCombinations(HashSet<Node> nodes){
+		
+		HashSet<HyperEdge> base = new HashSet<HyperEdge>();
+		
+		ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes, base);
+		
+		HyperEdge[] aux = new HyperEdge[parents.size()];
+
+		HashSet<EdgeSet> combinations = new HashSet<EdgeSet>();
+		
+		parentCombinations(parents, 0, aux, combinations, base);
+		
+		return combinations;
 	}
 
 	private void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
@@ -298,4 +306,6 @@ public class HyperGraph
 			return "[" + name + ", " + weight + "]";
 		}
 	}
+	
+	
 }
