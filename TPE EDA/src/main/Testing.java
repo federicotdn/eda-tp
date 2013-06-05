@@ -11,7 +11,9 @@ public class Testing
 		
 		HyperGraph g = GraphLoader.loadGraph("H.hg");
 		
-		g.bestFirstSearch();
+		for (int i = 0; i < 4; i++)
+			g.minimumPathApprox();
+		//g.minimumPathExact();
 		
 //		HyperGraph A = GraphLoader.loadGraph("A.hg");
 //		HyperGraph B = GraphLoader.loadGraph("B.hg");
