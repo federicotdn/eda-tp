@@ -89,7 +89,7 @@ public class HyperGraph
 
 		public boolean visited;
 
-		private boolean isTop;
+		public boolean isTop;
 
 		public final double weight;
 
@@ -325,24 +325,28 @@ public class HyperGraph
 		EdgeSet previous = null;
 		minComb = minPath;
 
-		while (current.getParent() != null)
+		while (current != null)
 		{
 			nodes = getParentNodes(current);
 			base = null;
 			ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes,
 					base);
 			HyperEdge[] aux = new HyperEdge[parents.size()];
-
+			minComb = null;
 			minCombination(parents, 0, aux, base);
 			if (minComb.getTotalWeight() < (current.getTotalWeight() - current
 					.getParent().getTotalWeight()))
-			{
 				minComb.setParent(current.getParent());
+			{
+				
 				if (previous != null)
 				{
 					previous.setParent(minComb);
 				}
+				current = minComb;
 			}
+			previous = current;
+			current = current.getParent();
 
 		}
 
