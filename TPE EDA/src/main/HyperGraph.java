@@ -54,7 +54,7 @@ public class HyperGraph
 
 	public void minimumPathExact()
 	{
-		System.out.println("Comenzando b��squeda de camino minimo (exacto) en "
+		System.out.println("Comenzando busqueda de camino minimo (exacto) en "
 				+ name + " ...");
 		long lastTime = System.currentTimeMillis();
 
@@ -73,7 +73,7 @@ public class HyperGraph
 
 		System.out.println("Camino minimo pesa: " + min.getTotalWeight());
 
-		System.out.println("Tard��: "
+		System.out.println("Tardo: "
 				+ ((double) System.currentTimeMillis() - lastTime) / 1000
 				+ " segundos.");
 	}
@@ -132,7 +132,6 @@ public class HyperGraph
 				HyperEdge auxEdge = node.tail.get(0);
 
 				if (!base.contains(auxEdge))
-				;
 				{
 					base.add(auxEdge);
 					auxEdge.setChildrenVisited();
@@ -247,7 +246,8 @@ public class HyperGraph
 	{
 		private ArrayList<Node> head; // Las dos listas son necesarias?
 		private ArrayList<Node> tail;
-
+		private ArrayList<HyperEdge> parents;
+		
 		private String name;
 
 		private boolean visited;
@@ -284,6 +284,11 @@ public class HyperGraph
 		public void setAsTop()
 		{
 			isTop = true;
+		}
+		
+		public ArrayList<HyperEdge> parents()
+		{
+			return parents;
 		}
 
 		public void setChildrenVisited()

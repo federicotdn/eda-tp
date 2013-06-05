@@ -122,12 +122,6 @@ public class HyperGraph
 				node.visited = true;
 		}
 
-		// @Override
-		// public int hashCode()
-		// {
-		// return name.hashCode();
-		// }
-
 		public void addVisitor()
 		{
 
