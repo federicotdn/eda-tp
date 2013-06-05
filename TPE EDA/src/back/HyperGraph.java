@@ -100,7 +100,6 @@ public class HyperGraph
 		public Set<HyperEdge> parents = new HashSet<HyperEdge>();
 		public Set<HyperEdge> children = new HashSet<HyperEdge>();
 
-
 		public int numberOfEntries;// hacer final
 		public int currentEntriesCount;
 
@@ -178,7 +177,7 @@ public class HyperGraph
 				this.path.mergeWith(parent.path);
 			}
 		}
-		
+
 		public void calculateDitanceAlt()
 		{
 			if (this.path == null)
@@ -233,14 +232,38 @@ public class HyperGraph
 
 		EdgeSet aux = new EdgeSet(hEdge);
 
+		toSet(hEdge);
+
+		double w = 0;
+
+		for (HyperEdge edge : this.aux)
+		{
+			w += edge.weight;
+		}
+
+		System.out.println(w);
+
+		System.out.println(hEdge.path.distance());
+
 		generateSet(aux);
 
 		minPath = aux;
 
-		//improvePath();
+		// improvePath();
 
 		return aux.getTotalWeight();
 
+	}
+
+	HashSet<HyperEdge> aux = new HashSet<HyperEdge>();
+
+	public void toSet(HyperEdge edge)
+	{
+		aux.add(edge);
+		for (HyperEdge e : edge.parents)
+		{
+			toSet(e);
+		}
 	}
 
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
@@ -280,6 +303,7 @@ public class HyperGraph
 		for (Node node : hEdge.tail)
 		{
 			node.tempoParentCount = 0;
+
 		}
 
 		for (HyperEdge edge : hEdge.parents)
@@ -310,22 +334,49 @@ public class HyperGraph
 
 	}
 
+	private void generateSetAlt(EdgeSet set)
+	{
+		EdgeSet current = set;
+
+		while (!set.isEmpty())
+		{
+
+			EdgeSet newSet = new EdgeSet();
+
+			for (HyperEdge edge : set)
+			{
+				for (HyperEdge parent : edge.parents)
+				{
+					newSet.add(parent);
+				}
+			}
+			
+		}
+		
+	}
+	
+	HashSet<HyperEdge> added = new HashSet<HyperEdge>();
+
 	private void generateSet(EdgeSet set)
 	{
 
+		System.out.println(set);
 		EdgeSet newSet = new EdgeSet();
 		for (HyperEdge edge : set)
 		{
 			for (HyperEdge parent : edge.parents)
 			{
-				newSet.add(parent);
+				if(!added.contains(parent)){
+					newSet.add(parent);
+				}
+				
 			}
 		}
 		if (newSet.isEmpty())
 		{
 			return;
 		}
-		newSet.setChild(set);
+		// newSet.setChild(set);
 		generateSet(newSet);
 		set.setParent(newSet);
 
@@ -339,7 +390,6 @@ public class HyperGraph
 
 		EdgeSet current = minPath;
 		EdgeSet previous = null;
-		minComb = minPath;
 		EdgeSet alternativePath = null;
 		double total = 0;
 
@@ -363,9 +413,6 @@ public class HyperGraph
 			minComb = null;
 
 			minCombination(parents, 0, aux, base);
-
-			System.out.println("Min: " + minComb.getTotalWeight()
-					+ "  Current :  " + current.getSelfWeight());
 
 			if (minComb.getTotalWeight() < current.getSelfWeight())
 			{
@@ -393,7 +440,8 @@ public class HyperGraph
 			i++;
 
 		}
-		System.out.println(alternativePath);
+
+		System.out.println(alternativePath.getTotalWeight());
 
 	}
 
@@ -467,7 +515,5 @@ public class HyperGraph
 			minCombination(parents, index + 1, combination, base);
 		}
 	}
-
-	
 
 }
