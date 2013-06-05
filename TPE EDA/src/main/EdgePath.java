@@ -31,6 +31,12 @@ public class EdgePath implements Iterable<HyperEdge>
 			totalWeight += edge.weight();
 	}
 	
+	public void markPath()
+	{
+		for (HyperEdge edge : path)
+			edge.setAsVisited();
+	}
+	
 	public void mergeWith(EdgePath other)
 	{
 		for (HyperEdge edge : other)

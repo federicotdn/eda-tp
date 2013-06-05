@@ -51,6 +51,12 @@ public class HyperGraph
 	{
 		return nodes;
 	}
+	
+	private void clearNodeMarks()
+	{
+		for (Node node : nodes)
+			node.visited = false;
+	}
 
 	// ----------------Algoritmo Exacto---------------------------------------
 
@@ -207,7 +213,9 @@ public class HyperGraph
 	
 	
 	// ----------------Algoritmo Aproximado-----------------------------------
-	public double bestFirstSearch() throws IOException
+
+	
+	private HyperEdge bestFirstSearch(Node begin, Node finish) throws IOException
 	{
 
 		HyperEdge hEdge = null;
@@ -224,7 +232,7 @@ public class HyperGraph
 					}
 				});
 
-		for (HyperEdge edge : start.head)
+		for (HyperEdge edge : begin.head)
 		{
 			edge.calculatePathDistance();
 			hq.offer(edge);
@@ -236,7 +244,7 @@ public class HyperGraph
 
 			for (Node node : hEdge.head)
 			{
-				if (node == end)
+				if (node == finish)
 				{
 					hasEnded = true;
 					break;
@@ -249,18 +257,31 @@ public class HyperGraph
 		System.out.println(hEdge.path.distance());
 		
 		//me queda hEdge con el camino para arriba
+		//marcar ejes del camino
 		
-		return 0;
+		return hEdge;
+	}
+	
+	public void minimumPathApprox() throws IOException
+	{
+		bestFirstSearch(start, end);
+		
+		clearNodeMarks();
+		
+	}
+	
+	private void improvePath(HyperEdge last)
+	{
+		
+		
+		
+		
 	}
 	
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
 	{
-
-		hEdge.visited = true;
-
 		for (Node node : hEdge.head)
 		{
-
 			if (!node.visited)
 			{
 				node.visited = true;
@@ -275,7 +296,6 @@ public class HyperGraph
 						removeUnnecesaryParents(edge);
 						edge.calculatePathDistance();
 						hq.offer(edge);
-
 					}
 				}
 
@@ -355,6 +375,11 @@ public class HyperGraph
 			this.name = name;
 			visited = false;
 		}
+		
+		private Node()
+		{
+			this("");
+		}
 
 		@Override
 		public String toString()
@@ -404,15 +429,15 @@ public class HyperGraph
 		private ArrayList<HyperEdge> parents;
 		
 		private String name;
-
-		private boolean visited;
-		private boolean isTop;
-		
-		private EdgePath path;
-
 		private final double weight;
 		
+		private EdgePath path;
+		private boolean visited;
 		public int currentEntriesCount;
+		private boolean isTaboo;
+		
+		private boolean isTop;
+
 
 		public HyperEdge(String name, double weight)
 		{
@@ -424,6 +449,8 @@ public class HyperGraph
 			this.weight = weight;
 			visited = false;
 			isTop = false;
+			
+			isTaboo = false;
 			
 			currentEntriesCount = 0;
 		}
@@ -475,6 +502,11 @@ public class HyperGraph
 		{
 			for (Node node : head)
 				node.visited = true;
+		}
+		
+		public void setAsVisited()
+		{
+			visited = true;
 		}
 
 		@Override
