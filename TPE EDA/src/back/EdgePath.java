@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import back.HyperGraph.HyperEdge;
 
+
+
 public class EdgePath implements Iterable<HyperEdge>
 {
 	private HashSet<HyperEdge> path;
