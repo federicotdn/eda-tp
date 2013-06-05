@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-
-
 public class HyperGraph
 {
 
@@ -20,7 +18,7 @@ public class HyperGraph
 	private Node end;
 
 	private double minDistance;
-	
+
 	private EdgeSet minPath;
 
 	List<HyperEdge> hEdges;
@@ -53,7 +51,6 @@ public class HyperGraph
 		public ArrayList<HyperEdge> tail;
 
 		public boolean visited;
-
 
 		public int tempoParentCount;
 
@@ -91,9 +88,8 @@ public class HyperGraph
 		public List<HyperEdge> edgeParents = new ArrayList<HyperEdge>();
 
 		public boolean visited;
-		
-		private boolean isTop;
 
+		private boolean isTop;
 
 		public final double weight;
 
@@ -220,11 +216,11 @@ public class HyperGraph
 			procesHEdge(hEdge, hq);
 
 		}
-		
+
 		EdgeSet aux = new EdgeSet(hEdge);
-		
+
 		generateSet(aux);
-		
+
 		minPath = aux;
 
 		return aux.getTotalWeight();
@@ -318,19 +314,108 @@ public class HyperGraph
 		set.setParent(newSet);
 
 	}
-	
-	private void improvePath(){
-	
-		EdgeSet current = minPath;
-		
-		while(current.getParent() != null){
-			
-		}
-		
-		
-	}
-	
 
-	
+	private void improvePath()
+	{
+
+		HashSet<Node> nodes;
+		HashSet<HyperEdge> base;
+
+		EdgeSet current = minPath;
+		EdgeSet previous = null;
+		minComb = minPath;
+
+		while (current.getParent() != null)
+		{
+			nodes = getParentNodes(current);
+			base = null;
+			ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes,
+					base);
+			HyperEdge[] aux = new HyperEdge[parents.size()];
+
+			minCombination(parents, 0, aux, base);
+			if (minComb.getTotalWeight() < (current.getTotalWeight() - current
+					.getParent().getTotalWeight()))
+			{
+				minComb.setParent(current.getParent());
+				if (previous != null)
+				{
+					previous.setParent(minComb);
+				}
+			}
+
+		}
+
+	}
+
+	private ArrayList<ArrayList<HyperEdge>> generateParents(
+			HashSet<Node> nodes, HashSet<HyperEdge> base)
+	{
+		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
+
+		for (Node node : nodes)
+		{
+			if (node.tail.size() == 1)
+			{
+				HyperEdge auxEdge = node.tail.get(0);
+
+				if (!base.contains(auxEdge))
+				;
+				{
+					base.add(auxEdge);
+					auxEdge.setChildrenVisited();
+				}
+			}
+		}
+
+		for (Node node : nodes)
+			if (!node.visited)
+			{
+				parents.add(node.tail);
+				node.visited = false;
+			}
+
+		return parents;
+	}
+
+	private HashSet<Node> getParentNodes(EdgeSet set)
+	{
+		HashSet<Node> nodes = new HashSet<Node>();
+
+		for (HyperEdge edge : set)
+		{
+			if (!edge.isTop)
+			{
+				nodes.addAll(edge.tail);
+			}
+		}
+		return nodes;
+	}
+
+	EdgeSet minComb;
+
+	private void minCombination(ArrayList<ArrayList<HyperEdge>> parents,
+			int index, HyperEdge[] combination, HashSet<HyperEdge> base)
+	{
+		if (index == parents.size())
+		{
+			EdgeSet aux = new EdgeSet(combination);
+			aux.addBase(base);
+			if (aux.getTotalWeight() < minComb.getTotalWeight())
+			{
+				minComb = aux;
+			}
+
+			return;
+		}
+
+		ArrayList<HyperEdge> edges = parents.get(index);
+
+		for (HyperEdge edge : edges)
+		{
+			combination[index] = edge;
+			minCombination(parents, index + 1, combination, base);
+		}
+	}
 
 }
