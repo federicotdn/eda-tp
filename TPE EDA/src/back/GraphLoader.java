@@ -70,6 +70,7 @@ public class GraphLoader
 			double edgeWeight = Double.valueOf(iterator.next());
 
 			HyperEdge edge = new HyperEdge(edgeName, edgeWeight);
+			edge.isTop = false;
 
 			Node aux;
 
@@ -116,6 +117,8 @@ public class GraphLoader
 				}
 
 				edge.tail.add(aux);
+				
+				if (aux == start) edge.isTop = true;
 			}
 
 			for (Node node : edge.tail)
