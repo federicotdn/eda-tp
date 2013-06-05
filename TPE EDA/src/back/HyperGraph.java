@@ -98,6 +98,8 @@ public class HyperGraph
 		public double distance;
 
 		public Set<HyperEdge> parents = new HashSet<HyperEdge>();
+		public Set<HyperEdge> children = new HashSet<HyperEdge>();
+
 
 		public int numberOfEntries;// hacer final
 		public int currentEntriesCount;
@@ -176,6 +178,18 @@ public class HyperGraph
 				this.path.mergeWith(parent.path);
 			}
 		}
+		
+		public void calculateDitanceAlt()
+		{
+			if (this.path == null)
+			{
+				this.path = new EdgePath(this);
+			}
+			for (HyperEdge child : this.children)
+			{
+				this.path.mergeWith(child.path);
+			}
+		}
 	}
 
 	public double exactAlgorithm() throws IOException
@@ -223,6 +237,8 @@ public class HyperGraph
 
 		minPath = aux;
 
+		//improvePath();
+
 		return aux.getTotalWeight();
 
 	}
@@ -244,7 +260,7 @@ public class HyperGraph
 					edge.addVisitor();
 					edge.parents.add(hEdge);
 
-					if (edge.currentEntriesCount == edge.numberOfEntries)
+					if (edge.currentEntriesCount == edge.tail.size())
 					{
 						removeUnnecesaryParents(edge);
 						edge.calculateDitance();
@@ -309,7 +325,7 @@ public class HyperGraph
 		{
 			return;
 		}
-
+		newSet.setChild(set);
 		generateSet(newSet);
 		set.setParent(newSet);
 
@@ -324,31 +340,60 @@ public class HyperGraph
 		EdgeSet current = minPath;
 		EdgeSet previous = null;
 		minComb = minPath;
+		EdgeSet alternativePath = null;
+		double total = 0;
 
+		int i = 0;
 		while (current != null)
 		{
 			nodes = getParentNodes(current);
-			base = null;
+			base = new HashSet<HyperEdge>();
 			ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes,
 					base);
 			HyperEdge[] aux = new HyperEdge[parents.size()];
-			minComb = null;
-			minCombination(parents, 0, aux, base);
-			if (minComb.getTotalWeight() < (current.getTotalWeight() - current
-					.getParent().getTotalWeight()))
-				minComb.setParent(current.getParent());
+
+			EdgeSet temp = new EdgeSet(current);
+			EdgeSet tempPrev = null;
+			if (previous != null)
 			{
-				
+				tempPrev = new EdgeSet(previous);
+
+			}
+
+			minComb = null;
+
+			minCombination(parents, 0, aux, base);
+
+			System.out.println("Min: " + minComb.getTotalWeight()
+					+ "  Current :  " + current.getSelfWeight());
+
+			if (minComb.getTotalWeight() < current.getSelfWeight())
+			{
+
+				EdgeSet tempParent = null;
+				if (current.getParent() != null)
+				{
+					tempParent = new EdgeSet(current.getParent());
+					minComb.setParent(tempParent);
+				}
+
 				if (previous != null)
 				{
-					previous.setParent(minComb);
+					tempPrev.setParent(minComb);
 				}
-				current = minComb;
+				temp = minComb;
 			}
+			if (i == 0)
+			{
+				alternativePath = temp;
+			}
+			total += temp.getSelfWeight();
 			previous = current;
 			current = current.getParent();
+			i++;
 
 		}
+		System.out.println(alternativePath);
 
 	}
 
@@ -364,7 +409,6 @@ public class HyperGraph
 				HyperEdge auxEdge = node.tail.get(0);
 
 				if (!base.contains(auxEdge))
-				;
 				{
 					base.add(auxEdge);
 					auxEdge.setChildrenVisited();
@@ -390,7 +434,7 @@ public class HyperGraph
 		{
 			if (!edge.isTop)
 			{
-				nodes.addAll(edge.tail);
+				nodes.addAll(edge.head);
 			}
 		}
 		return nodes;
@@ -405,7 +449,9 @@ public class HyperGraph
 		{
 			EdgeSet aux = new EdgeSet(combination);
 			aux.addBase(base);
-			if (aux.getTotalWeight() < minComb.getTotalWeight())
+			if (minComb == null
+					|| (aux != null && aux.getTotalWeight() < minComb
+							.getTotalWeight()))
 			{
 				minComb = aux;
 			}
@@ -421,5 +467,7 @@ public class HyperGraph
 			minCombination(parents, index + 1, combination, base);
 		}
 	}
+
+	
 
 }

@@ -60,10 +60,10 @@ public class EdgeSet implements Iterable<HyperEdge>
 	
 	public void setChild(EdgeSet child)
 	{
-		if(child != null){
-			this.totalWeight += child.totalWeight;
-
-		}
+//		if(child != null){
+//			this.totalWeight += child.totalWeight;
+//
+//		}
 		this.child = child;
 	}
 
@@ -163,6 +163,12 @@ public class EdgeSet implements Iterable<HyperEdge>
 		this.child = null;
 	}
 	
+	public double getSelfWeight(){
+		if(this.parent == null){
+			return this.totalWeight;
+		}
+		return this.totalWeight - this.parent.totalWeight;
+	}
 	
 	
 
