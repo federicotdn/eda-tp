@@ -9,9 +9,9 @@ public class Testing
 	{
 		//Metodo main de paquete Main - keep it clean
 		
-		HyperGraph g = GraphLoader.loadGraph("A.hg");
+		HyperGraph g = GraphLoader.loadGraph("H.hg");
 		
-		g.minimumPathExact();
+		g.bestFirstSearch();
 		
 //		HyperGraph A = GraphLoader.loadGraph("A.hg");
 //		HyperGraph B = GraphLoader.loadGraph("B.hg");

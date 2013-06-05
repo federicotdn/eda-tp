@@ -1,9 +1,11 @@
 package main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -202,6 +204,123 @@ public class HyperGraph
 	}
 
 	// ----------------Algoritmo Exacto End-----------------------------------
+	
+	
+	// ----------------Algoritmo Aproximado-----------------------------------
+	public double bestFirstSearch() throws IOException
+	{
+
+		HyperEdge hEdge = null;
+		boolean hasEnded = false;
+
+		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(10,
+				new Comparator<HyperEdge>() {
+					@Override
+					public int compare(HyperEdge edge1, HyperEdge edge2)
+					{
+						Double aux1 = (Double) edge1.path.distance();
+						Double aux2 = (Double) edge2.path.distance();
+						return aux1.compareTo(aux2);
+					}
+				});
+
+		for (HyperEdge edge : start.head)
+		{
+			edge.calculatePathDistance();
+			hq.offer(edge);
+		}
+
+		while (!hq.isEmpty() && !hasEnded)
+		{
+			hEdge = hq.poll();
+
+			for (Node node : hEdge.head)
+			{
+				if (node == end)
+				{
+					hasEnded = true;
+					break;
+				}
+			}
+			procesHEdge(hEdge, hq);
+
+		}
+		
+		System.out.println(hEdge.path.distance());
+		
+		//me queda hEdge con el camino para arriba
+		
+		return 0;
+	}
+	
+	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
+	{
+
+		hEdge.visited = true;
+
+		for (Node node : hEdge.head)
+		{
+
+			if (!node.visited)
+			{
+				node.visited = true;
+
+				for (HyperEdge edge : node.head)
+				{
+					edge.addVisitor();
+					edge.parents.add(hEdge);
+
+					if (edge.currentEntriesCount == edge.tail.size())
+					{
+						removeUnnecesaryParents(edge);
+						edge.calculatePathDistance();
+						hq.offer(edge);
+
+					}
+				}
+
+			}
+		}
+
+	}
+	
+	private void removeUnnecesaryParents(HyperEdge hEdge)
+	{
+
+		for (Node node : hEdge.tail)
+		{
+			node.tempParentCount = 0;
+		}
+
+		for (HyperEdge edge : hEdge.parents)
+		{
+			addParentToChildren(edge);
+		}
+
+		Iterator<HyperEdge> it = hEdge.parents.iterator();
+
+		while (it.hasNext())
+		{
+
+			HyperEdge current = it.next();
+			substractParentToChildren(current);
+
+			if (!hasMissingParents(current))
+			{
+				it.remove();
+
+			} else
+			{
+
+				addParentToChildren(current);
+			}
+		}
+
+		it = hEdge.parents.iterator();
+
+	}
+	
+	// ----------------Algoritmo Aproximado-End--------------------------------
 
 	protected static class Node
 	{
@@ -209,6 +328,8 @@ public class HyperGraph
 		private ArrayList<HyperEdge> tail;
 
 		private String name;
+		
+		public int tempParentCount;
 
 		private boolean visited;
 
@@ -241,6 +362,40 @@ public class HyperGraph
 			return "(" + name + ")";
 		}
 	}
+	
+	//Metodos de utilidad para HyperEdge
+	
+	public static void addParentToChildren(HyperEdge edge)
+	{
+
+		for (Node node : edge.head)
+		{
+			node.tempParentCount++;
+		}
+	}
+	
+	public static void substractParentToChildren(HyperEdge edge)
+	{
+
+		for (Node node : edge.head)
+		{
+			node.tempParentCount--;
+		}
+	}
+	
+	public static boolean hasMissingParents(HyperEdge edge)
+	{
+
+		for (Node node : edge.head)
+		{
+			if (node.tempParentCount == 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	protected static class HyperEdge
 	{
@@ -252,18 +407,25 @@ public class HyperGraph
 
 		private boolean visited;
 		private boolean isTop;
+		
+		private EdgePath path;
 
 		private final double weight;
+		
+		public int currentEntriesCount;
 
 		public HyperEdge(String name, double weight)
 		{
 			head = new ArrayList<Node>();
 			tail = new ArrayList<Node>();
+			parents = new ArrayList<HyperEdge>();
 
 			this.name = name;
 			this.weight = weight;
 			visited = false;
 			isTop = false;
+			
+			currentEntriesCount = 0;
 		}
 
 		public ArrayList<Node> tail()
@@ -279,6 +441,24 @@ public class HyperGraph
 		public double weight()
 		{
 			return weight;
+		}
+		
+		public void calculatePathDistance()
+		{
+			if (this.path == null)
+			{
+				this.path = new EdgePath(this);
+			}
+			
+			for (HyperEdge parent : this.parents)
+			{
+				this.path.mergeWith(parent.path);
+			}
+		}
+		
+		public void addVisitor()
+		{
+			currentEntriesCount++;
 		}
 
 		public void setAsTop()
