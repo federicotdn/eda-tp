@@ -34,19 +34,16 @@ public class HyperGraph
 		hEdges = new ArrayList<HyperEdge>();
 		nodes = new ArrayList<Node>();
 	}
-	
 
 	public Node getStart()
 	{
 		return start;
 	}
 
-
 	public Node getEnd()
 	{
 		return end;
 	}
-
 
 	protected static class Node
 	{
@@ -57,9 +54,8 @@ public class HyperGraph
 		public ArrayList<HyperEdge> tail;
 
 		public boolean visited;
-		
-		public int tempoParentCount;
 
+		public int tempoParentCount;
 
 		public Node(String name)
 		{
@@ -77,7 +73,7 @@ public class HyperGraph
 			// TODO Auto-generated method stub
 			return name;
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
@@ -97,13 +93,13 @@ public class HyperGraph
 		public boolean visited;
 
 		public final double weight;
-		
-		public EdgePath path; //si anda entonces no es necesario tener distance
+
+		public EdgePath path; // si anda entonces no es necesario tener distance
 
 		public double distance;
-		
+
 		public Set<HyperEdge> parents = new HashSet<HyperEdge>();
-		
+
 		public int numberOfEntries;// hacer final
 		public int currentEntriesCount;
 
@@ -113,25 +109,25 @@ public class HyperGraph
 			this.weight = weight;
 			visited = false;
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			return "[" + name + ", " + weight + "]";
 		}
-		
+
 		public void setChildrenVisited()
 		{
 			for (Node node : head)
 				node.visited = true;
 		}
-		
-//		@Override
-//		public int hashCode()
-//		{
-//			return name.hashCode();
-//		}
-		
+
+		// @Override
+		// public int hashCode()
+		// {
+		// return name.hashCode();
+		// }
+
 		public void addVisitor()
 		{
 
@@ -169,12 +165,15 @@ public class HyperGraph
 
 			return false;
 		}
-		
-		public void calculateDitance(){
-			if(this.path == null){
+
+		public void calculateDitance()
+		{
+			if (this.path == null)
+			{
 				this.path = new EdgePath(this);
 			}
-			for(HyperEdge parent: this.parents){
+			for (HyperEdge parent : this.parents)
+			{
 				this.path.mergeWith(parent.path);
 			}
 		}
@@ -185,16 +184,17 @@ public class HyperGraph
 
 		HyperEdge hEdge = null;
 		boolean hasEnded = false;
-		
-		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(10,new Comparator<HyperEdge>(){
-			@Override
-			public int compare(HyperEdge edge1, HyperEdge edge2)
-			{
-				Double aux1 = (Double) edge1.path.distance();
-				Double aux2 = (Double) edge2.path.distance();
-				return aux1.compareTo(aux2);
-			}
-		});
+
+		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(10,
+				new Comparator<HyperEdge>() {
+					@Override
+					public int compare(HyperEdge edge1, HyperEdge edge2)
+					{
+						Double aux1 = (Double) edge1.path.distance();
+						Double aux2 = (Double) edge2.path.distance();
+						return aux1.compareTo(aux2);
+					}
+				});
 
 		for (HyperEdge edge : start.head)
 		{
@@ -217,20 +217,14 @@ public class HyperGraph
 			procesHEdge(hEdge, hq);
 
 		}
-
 		
-
+		EdgeSet aux = new EdgeSet(hEdge);
 		
+		generateSet(aux);
 
-
-
-		return hEdge.path.distance();
+		return aux.getTotalWeight();
 
 	}
-
-	
-
-	
 
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
 	{
@@ -298,52 +292,26 @@ public class HyperGraph
 		it = hEdge.parents.iterator();
 
 	}
-	
 
-	
-	private void markPath(HyperEdge edge, HashSet<HyperEdge> path) //auxlilar, sacar
+	private void generateSet(EdgeSet set)
 	{
-		edge.visited = true;
-		path.add(edge);
-		
-		for (HyperEdge parent : edge.edgeParents)
-			markPath(parent, path);
+
+		EdgeSet newSet = new EdgeSet();
+		for (HyperEdge edge : set)
+		{
+			for (HyperEdge parent : edge.parents)
+			{
+				newSet.add(parent);
+			}
+		}
+		if (newSet.isEmpty())
+		{
+			return;
+		}
+
+		generateSet(newSet);
+		set.setParent(newSet);
+
 	}
-	
-	private double calculatePath(HyperEdge edge) //auxiliar, sacar
-	{
-		HashSet<HyperEdge> path = new HashSet<HyperEdge>();
-		
-		fillPath(edge, path);
-		
-		double total = 0;
-		for (HyperEdge e : path)
-			total += e.weight;
-		return total;
-	}
-	
-	private void fillPath(HyperEdge edge, HashSet<HyperEdge> path) //auxiliar, sacar
-	{
-		path.add(edge);
-		
-		for (HyperEdge parent : edge.edgeParents)
-			fillPath(parent, path);
-	}
-	
-	
-	//Variables globales de EXACT ALGORITHM despues las saco
-	
-	public HashSet<HyperEdge> visited = new HashSet<HyperEdge>();
-	
-	int combinaciones = 0;
-	
-	int totalcombinaciones = 0;
-	int totalejes = 0;
-	
-	HashSet<HyperEdge> calculated = new HashSet<HyperEdge>(); 
-	
-	//end variables globales
-	
-	
 
 }
