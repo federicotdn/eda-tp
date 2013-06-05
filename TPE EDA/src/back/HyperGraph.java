@@ -53,7 +53,6 @@ public class HyperGraph
 		public ArrayList<HyperEdge> tail;
 
 		public boolean visited;
-		private boolean isTop;
 
 
 		public int tempoParentCount;
@@ -92,6 +91,9 @@ public class HyperGraph
 		public List<HyperEdge> edgeParents = new ArrayList<HyperEdge>();
 
 		public boolean visited;
+		
+		private boolean isTop;
+
 
 		public final double weight;
 
