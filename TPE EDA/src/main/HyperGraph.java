@@ -89,9 +89,11 @@ public class HyperGraph
 		System.out.println("Tardo: "
 				+ ((double) System.currentTimeMillis() - lastTime) / 1000
 				+ " segundos.");
+
+		markPath(min);
 	}
 
-	public HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
+	private HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
 
 	private void minimumPathExact(EdgeSet current)
 	{
@@ -152,11 +154,13 @@ public class HyperGraph
 			}
 		}
 
+		int i = 0;
 		for (Node node : nodes)
 			if (!node.visited)
 			{
 				parents.add(node.tail);
 				node.visited = false;
+
 			}
 
 		return parents;
@@ -180,6 +184,8 @@ public class HyperGraph
 	{
 
 		HashSet<HyperEdge> base = new HashSet<HyperEdge>();
+
+		Node[] nodesArray = new Node[nodes.size()];
 
 		ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes, base);
 
@@ -209,25 +215,43 @@ public class HyperGraph
 
 		for (HyperEdge edge : edges)
 		{
+
 			combination[index] = edge;
+
 			parentCombinations(parents, index + 1, combination, combinations,
 					base);
 		}
+	}
+
+	private void markPath(EdgeSet set)
+	{
+		if (set == null)
+		{
+			return;
+		}
+
+		for (HyperEdge edge : set)
+		{
+			edge.visited = true;
+		}
+
+		markPath(set.getParent());
+
 	}
 
 	// ----------------Algoritmo Exacto End-----------------------------------
 
 	// ----------------Algoritmo Aproximado-----------------------------------
 
-	private HyperEdge bestFirstSearch(Node begin, Node finish)
-			throws IOException
+	private HyperEdge bestFirstSearch(Node begin, Node finish,
+			long remainingTime) throws IOException
 	{
 
 		HyperEdge hEdge = null;
 		boolean hasEnded = false;
 
-		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(10,
-				new Comparator<HyperEdge>() {
+		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(
+				hEdges.size(), new Comparator<HyperEdge>() {
 					@Override
 					public int compare(HyperEdge edge1, HyperEdge edge2)
 					{
@@ -247,6 +271,11 @@ public class HyperGraph
 
 		while (!hq.isEmpty() && !hasEnded)
 		{
+			// if (remainingTime <= 0)
+			// {
+			// return null;
+			// }
+
 			hEdge = hq.poll();
 
 			for (Node node : hEdge.head)
@@ -274,66 +303,35 @@ public class HyperGraph
 
 	public void minimumPathApprox(int maxTimeSeg) throws IOException
 	{
-		long maxTime = maxTimeSeg * 1000;
-		long time = System.currentTimeMillis();
-		
-		HyperEdge edge = bestFirstSearch(start, end);
-		HyperEdge result;
-		LinkedList<HyperEdge> taboos;
-		
-		int numberOfTaboos = 1;
-		int i;
+		long maxTimeMillis = maxTimeSeg * 1000;
+		long startingTime = System.currentTimeMillis();
 
+		HyperEdge edge = bestFirstSearch(start, end,
+				maxTimeMillis - (System.currentTimeMillis() - startingTime));
 		this.minDistance = edge.path.distance();
 		this.minPath = edge.path.getPath();
 
-		resetGraph();
-		
+		improvePath(edge, startingTime, maxTimeMillis);
 
-		Iterator<HyperEdge> it = minPath.iterator();
-		
-
-		while ((System.currentTimeMillis() - time) < maxTime)
-		{
-			taboos = new LinkedList<HyperEdge>();
-			if(!it.hasNext()){
-				it = minPath.iterator();
-				numberOfTaboos++;
-			}
-			else{
-				i = 0;
-				while(it.hasNext() && i < numberOfTaboos){
-					edge = it.next();
-					edge.isTaboo = true;
-					i++;
-					taboos.add(edge);
-				}
-			}
-			
-			
-			result = bestFirstSearch(start, end);
-			if (result != null && (result.path.distance() < minDistance))
-			{
-				minDistance = result.path.distance();
-				minPath = result.path.getPath();
-				it = minPath.iterator();
-			} else
-			{
-				
-				for(HyperEdge e: taboos){
-					e.isTaboo = false;
-				}
-			}
-			resetGraph();
-
-
-		}
-
-		System.out.println(minDistance);
+		clearNodeMarks();
 
 	}
 
-	private void resetGraph()
+	private HyperEdge pickRandomEdge(HashSet<HyperEdge> set)
+	{
+		int rand = (int) (Math.random() * set.size());
+		Iterator<HyperEdge> it = set.iterator();
+		HyperEdge edge = null;
+
+		for (int i = 0; i <= rand; i++)
+		{
+			edge = it.next();
+		}
+
+		return edge;
+	}
+
+	public void resetGraph()
 	{
 		clearNodeMarks();
 		clearEdges();
@@ -349,9 +347,71 @@ public class HyperGraph
 		}
 	}
 
-	private void improvePath(HyperEdge last)
+	private void improvePath(HyperEdge last, long startingTime,
+			long maxTimeMillis) throws IOException
 	{
+		HyperEdge edge;
+		HyperEdge result = null;
+		HashSet<HyperEdge> current = last.path.getPath();
+		HashSet<HyperEdge> previous = null;
+		HashSet<HyperEdge> taboo = new HashSet<HyperEdge>();
 
+		int i = 0;
+
+		while ((System.currentTimeMillis() - startingTime) < maxTimeMillis)
+		{
+
+			if (i == 1000)
+			{
+				taboo = new HashSet<HyperEdge>();
+			}
+
+			if (current != null)
+			{
+				previous = current;
+				edge = pickRandomEdge(current);
+				while (taboo.contains(edge))
+				{
+					edge = pickRandomEdge(current);
+				}
+			} else
+			{
+				edge = pickRandomEdge(previous);
+				while (taboo.contains(edge))
+				{
+					edge = pickRandomEdge(previous);
+				}
+			}
+
+			edge.isTaboo = true;
+			taboo.add(edge);
+			resetGraph();
+
+			result = bestFirstSearch(start, end,
+					maxTimeMillis - (System.currentTimeMillis() - startingTime));
+			if (result != null && (result.path.distance() < minDistance))
+			{
+				minDistance = result.path.distance();
+				minPath = result.path.getPath();
+				System.out.println(result.path.distance());
+				current = minPath;
+			}
+
+			edge.isTaboo = false;
+
+			if (result == null)
+			{
+				current = null;
+			} else
+			{
+				current = result.path.getPath();
+			}
+
+		}
+
+		System.out.println(minDistance);
+		System.out.println((double) (System.currentTimeMillis() - startingTime)
+				/ 1000 + " segundos ");
 	}
 
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
@@ -416,6 +476,105 @@ public class HyperGraph
 		}
 
 		it = hEdge.parents.iterator();
+
+	}
+
+	public void minimumPathApproxAlt(int maxTimeSeg) throws IOException
+	{
+		long maxTimeMillis = maxTimeSeg * 1000;
+		long startingTime = System.currentTimeMillis();
+		long lastTime = 0;
+
+		HyperEdge edge = bestFirstSearch(start, end,
+				maxTimeMillis - (System.currentTimeMillis() - startingTime));
+		HyperEdge result;
+		LinkedList<HyperEdge> taboos;
+
+		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
+		int numberOfTaboos = 1;
+		int i;
+		int size = 0;
+		int count = 0;
+
+		this.minDistance = edge.path.distance();
+		this.minPath = edge.path.getPath();
+
+		resetGraph();
+
+		Iterator<HyperEdge> it = minPath.iterator();
+
+		while ((System.currentTimeMillis() - startingTime) < maxTimeMillis)
+		{
+			taboos = new LinkedList<HyperEdge>();
+			if (!it.hasNext())
+			{
+				it = minPath.iterator();
+				numberOfTaboos++;
+				size = minPath.size();
+				//System.out.println(numberOfTaboos);
+			}
+
+			i = 0;
+			while (it.hasNext() && i < numberOfTaboos)
+			{
+				edge = it.next();
+//				if (!recentTaboos.contains(edge))
+//				{
+					i++;
+					taboos.add(edge);
+//					recentTaboos.add(edge);
+					edge.isTaboo = true;
+//				}
+			}
+
+			result = bestFirstSearch(start, end,
+					maxTimeMillis - (System.currentTimeMillis() - startingTime));
+
+			if (result != null && (result.path.distance() < minDistance))
+			{
+				minDistance = result.path.distance();
+				System.out.println("Encontre resultado menor: " + minDistance);
+				minPath = result.path.getPath();
+				it = minPath.iterator();
+				size = minPath.size();
+			}else{
+
+			for (HyperEdge e : taboos)
+			{
+				e.isTaboo = false;
+			}
+
+			}
+			
+//			if(numberOfTaboos >= size && result != null){
+//				size = result.path.getPath().size();
+//				it = result.path.getPath().iterator();
+//				numberOfTaboos= 0;
+//				
+//			}
+
+			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
+
+			if (thisTime != lastTime && thisTime % 5 == 0)
+			{
+				System.out.println("Tiempo: " + thisTime + " s");
+				lastTime = thisTime;
+			}
+			
+			resetGraph();
+			
+		}
+
+		System.out.println(minDistance);
+
+	}
+
+	private void markPath(HashSet<HyperEdge> set)
+	{
+		for (HyperEdge edge : set)
+		{
+			edge.visited = true;
+		}
 
 	}
 
@@ -590,9 +749,7 @@ public class HyperGraph
 		@Override
 		public int hashCode()
 		{
-			return super.hashCode(); // Dejamos el hashcode de Object, por ahora
-										// Quizas darle un ID unico a cada eje y
-										// usar eso
+			return super.hashCode();
 		}
 
 		@Override
@@ -601,5 +758,4 @@ public class HyperGraph
 			return "[" + name + ", " + weight + "]";
 		}
 	}
-
 }
