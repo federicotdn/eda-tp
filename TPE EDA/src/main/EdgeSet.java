@@ -36,6 +36,10 @@ public class EdgeSet implements Iterable<HyperEdge>
 		totalWeight += parent.totalWeight;
 		this.parent = parent;
 	}
+	
+	public EdgeSet getParent(){
+		return parent;
+	}
 
 	@Override
 	public Iterator<HyperEdge> iterator()
