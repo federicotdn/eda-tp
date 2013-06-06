@@ -272,8 +272,9 @@ public class HyperGraph
 		return hEdge;
 	}
 
-	public void minimumPathApprox(long maxTime) throws IOException
+	public void minimumPathApprox(int maxTimeSeg) throws IOException
 	{
+		long maxTime = maxTimeSeg * 1000;
 		long time = System.currentTimeMillis();
 		
 		HyperEdge edge = bestFirstSearch(start, end);
@@ -288,12 +289,11 @@ public class HyperGraph
 
 		resetGraph();
 		
-		boolean flag = false;
 
 		Iterator<HyperEdge> it = minPath.iterator();
 		
 
-		while (!flag)
+		while ((System.currentTimeMillis() - time) < maxTime)
 		{
 			taboos = new LinkedList<HyperEdge>();
 			if(!it.hasNext()){
@@ -317,7 +317,6 @@ public class HyperGraph
 				minDistance = result.path.distance();
 				minPath = result.path.getPath();
 				it = minPath.iterator();
-				flag = true;
 			} else
 			{
 				
@@ -346,6 +345,7 @@ public class HyperGraph
 		{
 			edge.path = null;
 			edge.parents = new ArrayList<HyperEdge>();
+			edge.currentEntriesCount = 0;
 		}
 	}
 
