@@ -28,6 +28,10 @@ public class HyperGraph
 
 	private HashSet<HyperEdge> minPath;
 
+	private long startingTime;
+
+	private long maxTime;
+
 	public HyperGraph(String name, Node start, Node end)
 	{
 		this.name = name;
@@ -243,8 +247,7 @@ public class HyperGraph
 
 	// ----------------Algoritmo Aproximado-----------------------------------
 
-	private HyperEdge bestFirstSearch(Node begin, Node finish,
-			long remainingTime) throws IOException
+	private HyperEdge bestFirstSearch(Node begin, Node finish)
 	{
 
 		HyperEdge hEdge = null;
@@ -271,10 +274,10 @@ public class HyperGraph
 
 		while (!hq.isEmpty() && !hasEnded)
 		{
-			// if (remainingTime <= 0)
-			// {
-			// return null;
-			// }
+			if ((System.currentTimeMillis() - startingTime) >= maxTime)
+			{
+				return null;
+			}
 
 			hEdge = hq.poll();
 
@@ -301,17 +304,16 @@ public class HyperGraph
 		return hEdge;
 	}
 
-	public void minimumPathApprox(int maxTimeSeg) throws IOException
+	public void minimumPathApprox(int maxTimeSeg)
 	{
-		long maxTimeMillis = maxTimeSeg * 1000;
-		long startingTime = System.currentTimeMillis();
+		maxTime = maxTimeSeg * 1000;
+		startingTime = System.currentTimeMillis();
 
-		HyperEdge edge = bestFirstSearch(start, end,
-				maxTimeMillis - (System.currentTimeMillis() - startingTime));
+		HyperEdge edge = bestFirstSearch(start, end);
 		this.minDistance = edge.path.distance();
 		this.minPath = edge.path.getPath();
 
-		improvePath(edge, startingTime, maxTimeMillis);
+		improvePath(edge);
 
 		clearNodeMarks();
 
@@ -347,8 +349,7 @@ public class HyperGraph
 		}
 	}
 
-	private void improvePath(HyperEdge last, long startingTime,
-			long maxTimeMillis) throws IOException
+	private void improvePath(HyperEdge last)
 	{
 		HyperEdge edge;
 		HyperEdge result = null;
@@ -358,7 +359,7 @@ public class HyperGraph
 
 		int i = 0;
 
-		while ((System.currentTimeMillis() - startingTime) < maxTimeMillis)
+		while ((System.currentTimeMillis() - startingTime) < maxTime)
 		{
 
 			if (i == 1000)
@@ -387,8 +388,7 @@ public class HyperGraph
 			taboo.add(edge);
 			resetGraph();
 
-			result = bestFirstSearch(start, end,
-					maxTimeMillis - (System.currentTimeMillis() - startingTime));
+			result = bestFirstSearch(start, end);
 			if (result != null && (result.path.distance() < minDistance))
 			{
 				minDistance = result.path.distance();
@@ -479,56 +479,42 @@ public class HyperGraph
 
 	}
 
-	public void minimumPathApproxAlt(int maxTimeSeg) throws IOException
+	public void minimumPathApproxAlt(int maxTimeSeg)
 	{
-		long maxTimeMillis = maxTimeSeg * 1000;
-		long startingTime = System.currentTimeMillis();
+		maxTime = maxTimeSeg * 1000;
+		startingTime = System.currentTimeMillis();
 		long lastTime = 0;
 
-		HyperEdge edge = bestFirstSearch(start, end,
-				maxTimeMillis - (System.currentTimeMillis() - startingTime));
-		HyperEdge result;
-		LinkedList<HyperEdge> taboos;
+		HyperEdge edge = bestFirstSearch(start, end);
+		HyperEdge result = null;
 
 		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
-		int numberOfTaboos = 1;
-		int i;
-		int size = 0;
+		HashSet<HyperEdge> current;
+
 		int count = 0;
 
 		this.minDistance = edge.path.distance();
 		this.minPath = edge.path.getPath();
+		current = minPath;
 
-		resetGraph();
+		// resetGraph();
 
 		Iterator<HyperEdge> it = minPath.iterator();
 
-		while ((System.currentTimeMillis() - startingTime) < maxTimeMillis)
+		while ((System.currentTimeMillis() - startingTime) < maxTime)
 		{
-			taboos = new LinkedList<HyperEdge>();
 			if (!it.hasNext())
 			{
-				it = minPath.iterator();
-				numberOfTaboos++;
-				size = minPath.size();
-				//System.out.println(numberOfTaboos);
+				current = pickRandomNeighbour(minPath);
+				it = current.iterator();
+
 			}
 
-			i = 0;
-			while (it.hasNext() && i < numberOfTaboos)
-			{
-				edge = it.next();
-//				if (!recentTaboos.contains(edge))
-//				{
-					i++;
-					taboos.add(edge);
-//					recentTaboos.add(edge);
-					edge.isTaboo = true;
-//				}
-			}
-
-			result = bestFirstSearch(start, end,
-					maxTimeMillis - (System.currentTimeMillis() - startingTime));
+			edge = it.next();
+			edge.isTaboo = true;
+			recentTaboos.add(edge);
+			resetGraph();
+			result = bestFirstSearch(start, end);
 
 			if (result != null && (result.path.distance() < minDistance))
 			{
@@ -536,22 +522,12 @@ public class HyperGraph
 				System.out.println("Encontre resultado menor: " + minDistance);
 				minPath = result.path.getPath();
 				it = minPath.iterator();
-				size = minPath.size();
-			}else{
+				current = minPath;
 
-			for (HyperEdge e : taboos)
+			} else
 			{
-				e.isTaboo = false;
+				edge.isTaboo = false;
 			}
-
-			}
-			
-//			if(numberOfTaboos >= size && result != null){
-//				size = result.path.getPath().size();
-//				it = result.path.getPath().iterator();
-//				numberOfTaboos= 0;
-//				
-//			}
 
 			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
 
@@ -560,13 +536,48 @@ public class HyperGraph
 				System.out.println("Tiempo: " + thisTime + " s");
 				lastTime = thisTime;
 			}
-			
-			resetGraph();
-			
+
+			if (count >= current.size())
+			{
+				for (HyperEdge taboo : recentTaboos)
+				{
+					taboo.isTaboo = false;
+				}
+				recentTaboos = new HashSet<HyperEdge>();
+				count = 0;
+				System.out.println("aca");
+
+			}
+
 		}
 
 		System.out.println(minDistance);
+		System.out.println((double) (System.currentTimeMillis() - startingTime)
+				/ 1000 + " segundos ");
 
+	}
+
+	private HashSet<HyperEdge> pickRandomNeighbour(HashSet<HyperEdge> current)
+	{
+
+		HashSet<HyperEdge> neighbour = current;
+		HyperEdge result = null;
+		HyperEdge edge;
+
+		while (result == null
+				&& (System.currentTimeMillis() - startingTime) < maxTime)
+		{
+			edge = pickRandomEdge(neighbour);
+			edge.isTaboo = true;
+			result = bestFirstSearch(start, end);
+			edge.isTaboo = false;
+			if (result != null)
+			{
+				neighbour = result.path.getPath();
+			}
+		}
+
+		return neighbour;
 	}
 
 	private void markPath(HashSet<HyperEdge> set)
@@ -575,6 +586,103 @@ public class HyperGraph
 		{
 			edge.visited = true;
 		}
+
+	}
+
+	public void minimumPathApproxAlt2(int maxTimeSeg) throws IOException
+	{
+		maxTime = maxTimeSeg * 1000;
+		startingTime = System.currentTimeMillis();
+		long lastTime = 0;
+
+		HyperEdge edge = bestFirstSearch(start, end);
+		HyperEdge result = null;
+
+		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
+		HashSet<HyperEdge> current;
+		
+		ArrayList<HyperEdge> taboos = new ArrayList<HyperEdge>();
+		int numberOfTaboos = 1;
+		int i = 0;
+
+		int count = 0;
+
+		this.minDistance = edge.path.distance();
+		this.minPath = edge.path.getPath();
+		current = minPath;
+
+		// resetGraph();
+
+		Iterator<HyperEdge> it = minPath.iterator();
+
+		while ((System.currentTimeMillis() - startingTime) < maxTime)
+		{
+			if (!it.hasNext())
+			{
+				if(numberOfTaboos >= current.size()){
+					current = pickRandomNeighbour(minPath);
+					it = current.iterator();
+					numberOfTaboos =1;
+				}
+				else{
+					numberOfTaboos++;
+				}
+				
+
+			}
+			i=0;
+			while(it.hasNext() && i < numberOfTaboos){
+				edge = it.next();
+				edge.isTaboo = true;
+				recentTaboos.add(edge);
+				i++;
+			}
+			
+			
+			resetGraph();
+			result = bestFirstSearch(start, end);
+
+			if (result != null && (result.path.distance() < minDistance))
+			{
+				minDistance = result.path.distance();
+				System.out.println("Encontre resultado menor: " + minDistance);
+				minPath = result.path.getPath();
+				it = minPath.iterator();
+				current = minPath;
+				numberOfTaboos = 1;
+
+			} else
+			{
+				for(HyperEdge taboo: taboos){
+					taboo.isTaboo = false;
+				}
+			}
+
+			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
+
+			if (thisTime != lastTime && thisTime % 5 == 0)
+			{
+				System.out.println("Tiempo: " + thisTime + " s");
+				lastTime = thisTime;
+			}
+
+			if (count >= current.size())
+			{
+				for (HyperEdge taboo : recentTaboos)
+				{
+					taboo.isTaboo = false;
+				}
+				recentTaboos = new HashSet<HyperEdge>();
+				count = 0;
+				System.out.println("aca");
+
+			}
+
+		}
+
+		System.out.println(minDistance);
+		System.out.println((double) (System.currentTimeMillis() - startingTime)
+				/ 1000 + " segundos ");
 
 	}
 
