@@ -56,4 +56,8 @@ public class EdgePath implements Iterable<HyperEdge>
 	{
 		return path.iterator();
 	}
+	
+	public HashSet<HyperEdge> getPath(){
+		return this.path;
+	}
 }

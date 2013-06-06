@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -22,6 +23,10 @@ public class HyperGraph
 
 	private List<HyperEdge> hEdges;
 	private List<Node> nodes;
+
+	private double minDistance;
+
+	private HashSet<HyperEdge> minPath;
 
 	public HyperGraph(String name, Node start, Node end)
 	{
@@ -51,7 +56,7 @@ public class HyperGraph
 	{
 		return nodes;
 	}
-	
+
 	private void clearNodeMarks()
 	{
 		for (Node node : nodes)
@@ -92,10 +97,9 @@ public class HyperGraph
 	{
 
 		HashSet<Node> nodes = getParentNodes(current);
-		
+
 		if (nodes.size() == 0) // Caso base
 			return;
-		
 
 		HashSet<EdgeSet> combinations = generateCombinations(nodes);
 
@@ -129,7 +133,8 @@ public class HyperGraph
 		current.setParent(min);
 	}
 
-	private ArrayList<ArrayList<HyperEdge>>  generateParents(HashSet<Node> nodes, HashSet<HyperEdge> base)
+	private ArrayList<ArrayList<HyperEdge>> generateParents(
+			HashSet<Node> nodes, HashSet<HyperEdge> base)
 	{
 		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
 
@@ -160,7 +165,7 @@ public class HyperGraph
 	private HashSet<Node> getParentNodes(EdgeSet set)
 	{
 		HashSet<Node> nodes = new HashSet<Node>();
-		
+
 		for (HyperEdge edge : set)
 		{
 			if (!edge.isTop)
@@ -170,19 +175,20 @@ public class HyperGraph
 		}
 		return nodes;
 	}
-	
-	private HashSet<EdgeSet> generateCombinations(HashSet<Node> nodes){
-		
+
+	private HashSet<EdgeSet> generateCombinations(HashSet<Node> nodes)
+	{
+
 		HashSet<HyperEdge> base = new HashSet<HyperEdge>();
-		
+
 		ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes, base);
-		
+
 		HyperEdge[] aux = new HyperEdge[parents.size()];
 
 		HashSet<EdgeSet> combinations = new HashSet<EdgeSet>();
-		
+
 		parentCombinations(parents, 0, aux, combinations, base);
-		
+
 		return combinations;
 	}
 
@@ -210,12 +216,11 @@ public class HyperGraph
 	}
 
 	// ----------------Algoritmo Exacto End-----------------------------------
-	
-	
+
 	// ----------------Algoritmo Aproximado-----------------------------------
 
-	
-	private HyperEdge bestFirstSearch(Node begin, Node finish) throws IOException
+	private HyperEdge bestFirstSearch(Node begin, Node finish)
+			throws IOException
 	{
 
 		HyperEdge hEdge = null;
@@ -226,16 +231,18 @@ public class HyperGraph
 					@Override
 					public int compare(HyperEdge edge1, HyperEdge edge2)
 					{
-						Double aux1 = (Double) edge1.path.distance();
-						Double aux2 = (Double) edge2.path.distance();
-						return aux1.compareTo(aux2);
+						return Double.compare(edge1.path.distance(),
+								edge2.path.distance());
 					}
 				});
 
 		for (HyperEdge edge : begin.head)
 		{
 			edge.calculatePathDistance();
-			hq.offer(edge);
+			if (!edge.isTaboo)
+			{
+				hq.offer(edge);
+			}
 		}
 
 		while (!hq.isEmpty() && !hasEnded)
@@ -253,31 +260,100 @@ public class HyperGraph
 			procesHEdge(hEdge, hq);
 
 		}
-		
-		System.out.println(hEdge.path.distance());
-		
-		//me queda hEdge con el camino para arriba
-		//marcar ejes del camino
-		
+
+		if (!hasEnded && hq.isEmpty())
+		{
+			return null;
+		}
+
+		// me queda hEdge con el camino para arriba
+		// marcar ejes del camino
+
 		return hEdge;
 	}
-	
-	public void minimumPathApprox() throws IOException
+
+	public void minimumPathApprox(long maxTime) throws IOException
 	{
-		bestFirstSearch(start, end);
+		long time = System.currentTimeMillis();
 		
-		clearNodeMarks();
+		HyperEdge edge = bestFirstSearch(start, end);
+		HyperEdge result;
+		LinkedList<HyperEdge> taboos;
 		
+		int numberOfTaboos = 1;
+		int i;
+
+		this.minDistance = edge.path.distance();
+		this.minPath = edge.path.getPath();
+
+		resetGraph();
+		
+		boolean flag = false;
+
+		Iterator<HyperEdge> it = minPath.iterator();
+		
+
+		while (!flag)
+		{
+			taboos = new LinkedList<HyperEdge>();
+			if(!it.hasNext()){
+				it = minPath.iterator();
+				numberOfTaboos++;
+			}
+			else{
+				i = 0;
+				while(it.hasNext() && i < numberOfTaboos){
+					edge = it.next();
+					edge.isTaboo = true;
+					i++;
+					taboos.add(edge);
+				}
+			}
+			
+			
+			result = bestFirstSearch(start, end);
+			if (result != null && (result.path.distance() < minDistance))
+			{
+				minDistance = result.path.distance();
+				minPath = result.path.getPath();
+				it = minPath.iterator();
+				flag = true;
+			} else
+			{
+				
+				for(HyperEdge e: taboos){
+					e.isTaboo = false;
+				}
+			}
+			resetGraph();
+
+
+		}
+
+		System.out.println(minDistance);
+
 	}
-	
+
+	private void resetGraph()
+	{
+		clearNodeMarks();
+		clearEdges();
+	}
+
+	private void clearEdges()
+	{
+		for (HyperEdge edge : hEdges)
+		{
+			edge.path = null;
+			edge.parents = new ArrayList<HyperEdge>();
+		}
+	}
+
 	private void improvePath(HyperEdge last)
 	{
-		
-		
-		
-		
+
 	}
-	
+
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
 	{
 		for (Node node : hEdge.head)
@@ -288,14 +364,17 @@ public class HyperGraph
 
 				for (HyperEdge edge : node.head)
 				{
-					edge.addVisitor();
-					edge.parents.add(hEdge);
-
-					if (edge.currentEntriesCount == edge.tail.size())
+					if (!edge.isTaboo)
 					{
-						removeUnnecesaryParents(edge);
-						edge.calculatePathDistance();
-						hq.offer(edge);
+						edge.addVisitor();
+						edge.parents.add(hEdge);
+
+						if (edge.currentEntriesCount == edge.tail.size())
+						{
+							removeUnnecesaryParents(edge);
+							edge.calculatePathDistance();
+							hq.offer(edge);
+						}
 					}
 				}
 
@@ -303,7 +382,7 @@ public class HyperGraph
 		}
 
 	}
-	
+
 	private void removeUnnecesaryParents(HyperEdge hEdge)
 	{
 
@@ -339,7 +418,7 @@ public class HyperGraph
 		it = hEdge.parents.iterator();
 
 	}
-	
+
 	// ----------------Algoritmo Aproximado-End--------------------------------
 
 	protected static class Node
@@ -348,7 +427,7 @@ public class HyperGraph
 		private ArrayList<HyperEdge> tail;
 
 		private String name;
-		
+
 		public int tempParentCount;
 
 		private boolean visited;
@@ -375,7 +454,7 @@ public class HyperGraph
 			this.name = name;
 			visited = false;
 		}
-		
+
 		private Node()
 		{
 			this("");
@@ -387,9 +466,9 @@ public class HyperGraph
 			return "(" + name + ")";
 		}
 	}
-	
-	//Metodos de utilidad para HyperEdge
-	
+
+	// Metodos de utilidad para HyperEdge
+
 	public static void addParentToChildren(HyperEdge edge)
 	{
 
@@ -398,7 +477,7 @@ public class HyperGraph
 			node.tempParentCount++;
 		}
 	}
-	
+
 	public static void substractParentToChildren(HyperEdge edge)
 	{
 
@@ -407,7 +486,7 @@ public class HyperGraph
 			node.tempParentCount--;
 		}
 	}
-	
+
 	public static boolean hasMissingParents(HyperEdge edge)
 	{
 
@@ -427,17 +506,16 @@ public class HyperGraph
 		private ArrayList<Node> head; // Las dos listas son necesarias?
 		private ArrayList<Node> tail;
 		private ArrayList<HyperEdge> parents;
-		
+
 		private String name;
 		private final double weight;
-		
+
 		private EdgePath path;
 		private boolean visited;
 		public int currentEntriesCount;
 		private boolean isTaboo;
-		
-		private boolean isTop;
 
+		private boolean isTop;
 
 		public HyperEdge(String name, double weight)
 		{
@@ -449,9 +527,9 @@ public class HyperGraph
 			this.weight = weight;
 			visited = false;
 			isTop = false;
-			
+
 			isTaboo = false;
-			
+
 			currentEntriesCount = 0;
 		}
 
@@ -469,20 +547,20 @@ public class HyperGraph
 		{
 			return weight;
 		}
-		
+
 		public void calculatePathDistance()
 		{
 			if (this.path == null)
 			{
 				this.path = new EdgePath(this);
 			}
-			
+
 			for (HyperEdge parent : this.parents)
 			{
 				this.path.mergeWith(parent.path);
 			}
 		}
-		
+
 		public void addVisitor()
 		{
 			currentEntriesCount++;
@@ -492,7 +570,7 @@ public class HyperGraph
 		{
 			isTop = true;
 		}
-		
+
 		public ArrayList<HyperEdge> parents()
 		{
 			return parents;
@@ -503,7 +581,7 @@ public class HyperGraph
 			for (Node node : head)
 				node.visited = true;
 		}
-		
+
 		public void setAsVisited()
 		{
 			visited = true;
@@ -523,6 +601,5 @@ public class HyperGraph
 			return "[" + name + ", " + weight + "]";
 		}
 	}
-	
-	
+
 }
