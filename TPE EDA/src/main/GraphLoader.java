@@ -19,7 +19,7 @@ public class GraphLoader
 	static String errorMessageNumbers = "La cantidad de tags no concuerda con el numero especificado.";
 	static String errorMessageFile = "Archivo debe ser formato .hg";
 
-	static String alphaNumericPattern = "^[a-zA-Z0-9_]*$";
+	static String alphaNumericPattern = "^[a-zA-Z0-9._]*$";
 
 	final static int minTagLength = 1, maxTagLength = 10;
 	final static int minTagsPerLine = 6;
@@ -164,7 +164,7 @@ public class GraphLoader
 			throw new IOException(errorMessageLength);
 		
 		if (!line.matches(alphaNumericPattern))
-			throw new IOException(errorMessagePattern);
+			throw new IOException("Error en: \"" + line + "\": " + errorMessagePattern);
 		
 		return line;
 	}
@@ -190,7 +190,7 @@ public class GraphLoader
 						throw new IOException(errorMessageLength);
 
 					if (!aux.matches(alphaNumericPattern))
-						throw new IOException(errorMessagePattern);
+						throw new IOException("Error en: \"" + aux + "\": " + errorMessagePattern);
 					
 					tags.add(aux);
 					current = new StringBuilder();
