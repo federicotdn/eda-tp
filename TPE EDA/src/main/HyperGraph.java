@@ -331,7 +331,7 @@ public class HyperGraph
 		return edge;
 	}
 
-	private void resetGraph()
+	public void resetGraph()
 	{
 		clearNodeMarks();
 		clearEdges();
@@ -490,8 +490,11 @@ public class HyperGraph
 		HyperEdge result;
 		LinkedList<HyperEdge> taboos;
 
+		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
 		int numberOfTaboos = 1;
 		int i;
+		int size = 0;
+		int count = 0;
 
 		this.minDistance = edge.path.distance();
 		this.minPath = edge.path.getPath();
@@ -507,16 +510,21 @@ public class HyperGraph
 			{
 				it = minPath.iterator();
 				numberOfTaboos++;
+				size = minPath.size();
+				//System.out.println(numberOfTaboos);
 			}
 
 			i = 0;
 			while (it.hasNext() && i < numberOfTaboos)
 			{
 				edge = it.next();
-				edge.isTaboo = true;
-				i++;
-				taboos.add(edge);
-
+//				if (!recentTaboos.contains(edge))
+//				{
+					i++;
+					taboos.add(edge);
+//					recentTaboos.add(edge);
+					edge.isTaboo = true;
+//				}
 			}
 
 			result = bestFirstSearch(start, end,
@@ -528,15 +536,22 @@ public class HyperGraph
 				System.out.println("Encontre resultado menor: " + minDistance);
 				minPath = result.path.getPath();
 				it = minPath.iterator();
-			} else
-			{
+				size = minPath.size();
+			}else{
 
-				for (HyperEdge e : taboos)
-				{
-					e.isTaboo = false;
-				}
+			for (HyperEdge e : taboos)
+			{
+				e.isTaboo = false;
 			}
-			resetGraph();
+
+			}
+			
+//			if(numberOfTaboos >= size && result != null){
+//				size = result.path.getPath().size();
+//				it = result.path.getPath().iterator();
+//				numberOfTaboos= 0;
+//				
+//			}
 
 			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
 
@@ -545,6 +560,9 @@ public class HyperGraph
 				System.out.println("Tiempo: " + thisTime + " s");
 				lastTime = thisTime;
 			}
+			
+			resetGraph();
+			
 		}
 
 		System.out.println(minDistance);
