@@ -16,7 +16,7 @@ import java.util.PriorityQueue;
 
 public class HyperGraph
 {
-	private String name;
+	public String name;
 
 	private Node start;
 	private Node end;
@@ -573,7 +573,6 @@ public class HyperGraph
 		HashSet<HyperEdge> neighbour = current;
 		HyperEdge result = null;
 		HyperEdge edge;
-		HyperEdge edge2;
 
 		resetGraph();
 		int i = 0;
@@ -581,12 +580,9 @@ public class HyperGraph
 				&& (System.currentTimeMillis() - startingTime) < maxTime)
 		{
 			edge = pickRandomEdge(neighbour);
-			edge2 = pickRandomEdge(neighbour);
 			edge.isTaboo = true;
-			edge2.isTaboo = true;
 			result = bestFirstSearch(start, end);
 			edge.isTaboo = false;
-			edge2.isTaboo = false;
 			if (result != null)
 			{
 				neighbour = result.path.getPath();
@@ -607,6 +603,8 @@ public class HyperGraph
 		}
 
 	}
+	
+	HashMap<HashSet<HyperEdge>, Integer> map = new HashMap<HashSet<HyperEdge>, Integer>();
 
 	public void minimumPathApproxAlt2(int maxTimeSeg)
 	{
@@ -645,6 +643,13 @@ public class HyperGraph
 					it = current.iterator();
 					numberOfTaboos = 1;
 					//System.out.println("aca");
+					if(!map.containsKey(current)){
+						map.put(current, 1);
+					}
+					else{
+						map.put(current, map.get(current) +1 );
+						
+					}
 
 				} else
 				{
@@ -717,6 +722,16 @@ public class HyperGraph
 			taboo.isTaboo = false;
 		}
 		resetGraph();
+		
+		System.out.println(map);
+		int max = 0;
+		for(Integer cont: map.values()){
+			if(cont > max){
+				max = cont;
+			}
+		}
+		System.out.println(max);
+		
 
 
 	}
@@ -728,7 +743,7 @@ public class HyperGraph
 		private ArrayList<HyperEdge> head; // Las dos listas son necesarias?
 		private ArrayList<HyperEdge> tail;
 
-		private String name;
+		public String name;
 
 		public int tempParentCount;
 
@@ -809,7 +824,7 @@ public class HyperGraph
 		private ArrayList<Node> tail;
 		private ArrayList<HyperEdge> parents;
 
-		private String name;
+		public String name;
 		private final double weight;
 
 		private EdgePath path;
@@ -818,6 +833,7 @@ public class HyperGraph
 		private boolean isTaboo;
 
 		private boolean isTop;
+		private boolean isBottom;
 
 		public HyperEdge(String name, double weight)
 		{
@@ -829,6 +845,7 @@ public class HyperGraph
 			this.weight = weight;
 			visited = false;
 			isTop = false;
+			isBottom = false;
 
 			isTaboo = false;
 
@@ -899,6 +916,14 @@ public class HyperGraph
 		public String toString()
 		{
 			return "[" + name + ", " + weight + "]";
+		}
+		
+		public void setAsBottom(){
+			isBottom = true;
+		}
+		
+		public boolean getVisited(){
+			return visited;
 		}
 	}
 }
