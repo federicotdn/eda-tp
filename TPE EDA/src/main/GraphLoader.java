@@ -16,9 +16,10 @@ public class GraphLoader
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
 	static String errorMessagePattern = "Nombres deben ser alfanumericos.";
 	static String errorMessageFormat = "Archivo mal formado.";
+	static String errorMessageNumbers = "La cantidad de tags no concuerda con el numero especificado.";
 	static String errorMessageFile = "Archivo debe ser formato .hg";
 
-	static String alphaNumericPattern = "^[a-zA-Z0-9]*$";
+	static String alphaNumericPattern = "^[a-zA-Z0-9_]*$";
 
 	final static int minTagLength = 1, maxTagLength = 10;
 	final static int minTagsPerLine = 6;
@@ -51,9 +52,9 @@ public class GraphLoader
 			linesRead++;
 			
 			if (linesRead == 1)
-				start = new Node(parseSingleTagAlt(line));
+				start = new Node(parseSingleTag(line));
 			else if (linesRead == 2)
-				end = new Node(parseSingleTagAlt(line));
+				end = new Node(parseSingleTag(line));
 		}
 
 		HyperGraph graph = new HyperGraph(graphName, start, end);
@@ -64,10 +65,13 @@ public class GraphLoader
 		while (reader.ready())
 		{
 			String line = reader.readLine();
+			
+			if (line.isEmpty()) 
+				throw new IOException(errorMessageFormat);
 
 			if (line.startsWith("#")) continue;
 
-			lineTags = parseMultipleTagsAlt(line);
+			lineTags = parseMultipleTags(line);
 			Iterator<String> iterator = lineTags.iterator();
 
 			String edgeName = iterator.next();
@@ -76,11 +80,19 @@ public class GraphLoader
 			HyperEdge edge = new HyperEdge(edgeName, edgeWeight);
 
 			Node aux;
+			
+			String next = iterator.next();
+			
+			if (!next.matches("[0-9]+"))
+				throw new IOException("Error: " + next + " no es un numero.");
 
-			int exitCount = Integer.valueOf(iterator.next());
+			int exitCount = Integer.valueOf(next);
 
 			for (; exitCount > 0; exitCount--)
 			{
+				if (!iterator.hasNext())
+					throw new IOException(errorMessageNumbers);
+				
 				String nodeName = iterator.next();
 
 				if (nodes.containsKey(nodeName))
@@ -101,10 +113,18 @@ public class GraphLoader
 				node.tail().add(edge);
 			}
 
-			int entryCount = Integer.valueOf(iterator.next());
+			next = iterator.next();
+			
+			if (!next.matches("[0-9]+"))
+				throw new IOException("Error: " + next + " no es un numero.");
+			
+			int entryCount = Integer.valueOf(next);
 
 			for (; entryCount > 0; entryCount--)
 			{
+				if (!iterator.hasNext())
+					throw new IOException(errorMessageNumbers);
+				
 				String nodeName = iterator.next();
 
 				if (nodes.containsKey(nodeName))
@@ -131,106 +151,64 @@ public class GraphLoader
 		}
 		
 		System.out.println("Grafo " + graphName + ".hg cargado.");
+		
+		reader.close();
+		fileinput.close();
 
 		return graph;
 	}
 
 	private static String parseSingleTag(String line) throws IOException
 	{
-		if (!line.startsWith("<") || !line.endsWith(">"))
-			throw new IOException(errorMessageFormat);
-
-		if (line.length() < minTagLength + 2
-				|| line.length() > maxTagLength + 2)
+		if (line.length() < minTagLength || line.length() > maxTagLength)
 			throw new IOException(errorMessageLength);
-
-		String content = line.substring(1, line.length() - 1);
-		if (!content.matches(alphaNumericPattern))
+		
+		if (!line.matches(alphaNumericPattern))
 			throw new IOException(errorMessagePattern);
-
-		return content;
-	}
-
-	private static LinkedList<String> parseMultipleTags(String lineString)
-			throws IOException
-	{
-		LinkedList<String> tags = new LinkedList<String>();
-		StringBuilder current = null;
-		char[] line = lineString.toCharArray();
-		boolean inTag = false;
-
-		for (char ch : line)
-		{
-			switch (ch)
-			{
-				case '<':
-					if (inTag) throw new IOException(errorMessageFormat);
-					inTag = true;
-					current = new StringBuilder();
-				break;
-
-				case '>':
-					String aux = current.toString();
-
-					if (!inTag) throw new IOException(errorMessageFormat);
-
-					if (aux.length() < minTagLength
-							|| aux.length() > maxTagLength)
-						throw new IOException(errorMessageLength);
-
-					if (!aux.matches(alphaNumericPattern))
-						throw new IOException(errorMessagePattern);
-
-					inTag = false;
-
-					tags.add(aux);
-				break;
-
-				default:
-					if (!inTag) throw new IOException(errorMessageFormat);
-					current.append(ch);
-				break;
-			}
-		}
-
-		if (inTag || tags.size() < minTagsPerLine)
-			throw new IOException(errorMessageFormat);
-
-		return tags;
-	}
-
-	private static String parseSingleTagAlt(String line) throws IOException // Borrar
-																			// despues
-	{
+		
 		return line;
 	}
 
-	private static LinkedList<String> parseMultipleTagsAlt(String lineString) // Borrar
-																				// despues
-			throws IOException
+	private static LinkedList<String> parseMultipleTags(String lineString) throws IOException
 	{
-		LinkedList<String> list = new LinkedList<String>();
+		LinkedList<String> tags = new LinkedList<String>();
 		char[] line = lineString.toCharArray();
 		StringBuilder current = new StringBuilder();
+		char lastChar = 0;
 
 		for (char ch : line)
 		{
 			switch (ch)
 			{
 				case ' ':
-					list.add(current.toString());
+					if (lastChar == ' ')
+						throw new IOException(errorMessageFormat);
+					
+					String aux = current.toString();
+					
+					if (aux.length() < minTagLength || aux.length() > maxTagLength)
+						throw new IOException(errorMessageLength);
+
+					if (!aux.matches(alphaNumericPattern))
+						throw new IOException(errorMessagePattern);
+					
+					tags.add(aux);
 					current = new StringBuilder();
 				break;
 
 				default:
-
 					current.append(ch);
 				break;
 			}
+			
+			lastChar = ch;
 		}
-		list.add(current.toString());
+		
+		tags.add(current.toString());
 
-		return list;
+		if (lastChar == ' ' || tags.size() < minTagsPerLine)
+			throw new IOException(errorMessageFormat);
+		
+		return tags;
 	}
-
 }
