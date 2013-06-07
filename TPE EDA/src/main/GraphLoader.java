@@ -121,11 +121,15 @@ public class GraphLoader
 				}
 
 				edge.head.add(aux);
+				
+				if(aux == end){
+					edge.isBottom = true;
+				}
 			}
 
 			for (Node node : edge.head)
 			{
-				node.tail().add(edge);
+				node.tail.add(edge);
 			}
 
 			next = iterator.next();
@@ -160,10 +164,10 @@ public class GraphLoader
 
 			for (Node node : edge.tail)
 			{
-				node.head().add(edge);
+				node.head.add(edge);
 			}
 
-			graph.hEdges.add(edge);
+			graph.hyperEdges.add(edge);
 		}
 		
 		reader.close();

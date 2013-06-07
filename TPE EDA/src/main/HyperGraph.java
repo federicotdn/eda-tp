@@ -1,6 +1,5 @@
 package main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class HyperGraph
 	public Node start;
 	public Node end;
 
-	public List<HyperEdge> hEdges;
+	public List<HyperEdge> hyperEdges;
 	public List<Node> nodes;
 
 	public double minDistance;
@@ -37,7 +36,7 @@ public class HyperGraph
 		this.name = name;
 		this.start = start;
 		this.end = end;
-		hEdges = new ArrayList<HyperEdge>();
+		hyperEdges = new ArrayList<HyperEdge>();
 		nodes = new ArrayList<Node>();
 	}
 
@@ -50,7 +49,7 @@ public class HyperGraph
 	
 	public  void clearEdges()
 	{
-		for (HyperEdge edge : hEdges)
+		for (HyperEdge edge : hyperEdges)
 		{
 			edge.edgePath = null;
 			edge.parents = new ArrayList<HyperEdge>();
@@ -63,6 +62,8 @@ public class HyperGraph
 	public double minimumPathExact()
 	{
 		EdgeSet min = null;
+		
+		long time = System.currentTimeMillis();
 
 		for (HyperEdge edge : end.tail)
 		{
@@ -78,11 +79,15 @@ public class HyperGraph
 		markEdgeSetPath(min);
 		end.visited = true;
 		
+		System.out.println("Tardó: " + (double) (System.currentTimeMillis() - time)/1000 + "  segundos");
+		
 		return min.totalWeight;
 		
 	}
 
 	private HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
+	private HashMap<HashSet, EdgeSet> visited2 = new HashMap<HashSet, EdgeSet>();
+	
 
 	private void minimumPathExact(EdgeSet current)
 	{
@@ -105,14 +110,14 @@ public class HyperGraph
 		{
 			Integer hash = sample.hashCode();
 
-			if (!visited.containsKey(hash))
+			if (!visited2.containsKey(sample.edges))
 			{
-				visited.put(hash, sample);
+				visited2.put(sample.edges, sample);
 
 				minimumPathExact(sample);
 			} else
 			{
-				sample = visited.get(hash);
+				sample = visited2.get(sample.edges);
 			}
 
 			if (min == null || (sample.totalWeight < min.totalWeight))
@@ -124,10 +129,10 @@ public class HyperGraph
 		current.setParent(min);
 	}
 
-	private ArrayList<ArrayList<HyperEdge>> generateParents(
+	private List<List<HyperEdge>> generateParents(
 			HashSet<Node> nodes, HashSet<HyperEdge> base)
 	{
-		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
+		List<List<HyperEdge>> parents = new ArrayList<List<HyperEdge>>();
 
 		for (Node node : nodes)
 		{
@@ -180,7 +185,7 @@ public class HyperGraph
 
 		Node[] nodesArray = new Node[nodes.size()];
 
-		ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes, base);
+		List<List<HyperEdge>> parents = generateParents(nodes, base);
 
 		HyperEdge[] aux = new HyperEdge[parents.size()];
 
@@ -191,7 +196,7 @@ public class HyperGraph
 		return combinations;
 	}
 
-	private void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
+	private void parentCombinations(List<List<HyperEdge>> parents,
 			int index, HyperEdge[] combination, HashSet<EdgeSet> combinations,
 			HashSet<HyperEdge> base)
 	{
@@ -204,7 +209,7 @@ public class HyperGraph
 			return;
 		}
 
-		ArrayList<HyperEdge> edges = parents.get(index);
+		List<HyperEdge> edges = parents.get(index);
 
 		for (HyperEdge edge : edges)
 		{
@@ -239,7 +244,7 @@ public class HyperGraph
 		boolean hasEnded = false;
 
 		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(
-				hEdges.size(), new Comparator<HyperEdge>() {
+				hyperEdges.size(), new Comparator<HyperEdge>() {
 					@Override
 					public int compare(HyperEdge edge1, HyperEdge edge2)
 					{
@@ -266,27 +271,20 @@ public class HyperGraph
 
 			hEdge = hq.poll();
 
-			for (Node node : hEdge.head)
-			{
-				if (node == finish)
-				{
-					hasEnded = true;
-					break;
-				}
+			if(hEdge.isBottom){
+				return hEdge;
 			}
 			procesHEdge(hEdge, hq);
 
 		}
 
-		if (!hasEnded && hq.isEmpty())
-		{
+		
 			return null;
-		}
+		
 
 		// me queda hEdge con el camino para arriba
 		// marcar ejes del camino
 
-		return hEdge;
 	}
 
 	public double minimumPathApproxAlt2(int maxTimeSeg)
@@ -297,6 +295,8 @@ public class HyperGraph
 		HyperEdge edge = bestFirstSearch(start, end);
 		this.minDistance = edge.edgePath.totalWeight;
 		this.minPath = edge.edgePath.path;
+		
+		
 
 		improvePath(edge);
 
@@ -335,6 +335,8 @@ public class HyperGraph
 		HashSet<HyperEdge> current = last.edgePath.path;
 		HashSet<HyperEdge> previous = null;
 		HashSet<HyperEdge> taboo = new HashSet<HyperEdge>();
+		
+		HashSet<HyperEdge> added = new HashSet<HyperEdge>();
 
 		while ((System.currentTimeMillis() - startingTime) < maxTime)
 		{
@@ -342,6 +344,7 @@ public class HyperGraph
 			if (current != null)
 			{
 				previous = current;
+				
 				edge = pickRandomEdge(current);
 
 			} else
@@ -581,7 +584,7 @@ public class HyperGraph
 		this.minPath = edge.edgePath.path;
 		current = minPath;
 
-		for (HyperEdge e : hEdges)
+		for (HyperEdge e : hyperEdges)
 		{
 			maxC += e.head.size();
 		}
@@ -669,8 +672,8 @@ public class HyperGraph
 
 	public static class Node
 	{
-		public ArrayList<HyperEdge> head; // Las dos listas son necesarias?
-		public ArrayList<HyperEdge> tail;
+		public List<HyperEdge> head; // Las dos listas son necesarias?
+		public List<HyperEdge> tail;
 
 		public String name;
 
@@ -678,15 +681,6 @@ public class HyperGraph
 
 		public boolean visited;
 
-		public ArrayList<HyperEdge> tail()
-		{
-			return tail;
-		}
-
-		public ArrayList<HyperEdge> head()
-		{
-			return head;
-		}
 
 		public String getName()
 		{
@@ -695,8 +689,8 @@ public class HyperGraph
 
 		public Node(String name)
 		{
-			head = new ArrayList<HyperEdge>();
-			tail = new ArrayList<HyperEdge>();
+			head = new LinkedList();
+			tail = new LinkedList();
 			this.name = name;
 			visited = false;
 		}
@@ -749,9 +743,9 @@ public class HyperGraph
 
 	public static class HyperEdge
 	{
-		public ArrayList<Node> head; // Las dos listas son necesarias?
-		public ArrayList<Node> tail;
-		public ArrayList<HyperEdge> parents;
+		public List<Node> head; // Las dos listas son necesarias?
+		public List<Node> tail;
+		public List<HyperEdge> parents;
 
 		public String name;
 		public final double weight;
@@ -766,9 +760,9 @@ public class HyperGraph
 
 		public HyperEdge(String name, double weight)
 		{
-			head = new ArrayList<Node>();
-			tail = new ArrayList<Node>();
-			parents = new ArrayList<HyperEdge>();
+			head = new LinkedList<Node>();
+			tail = new LinkedList<Node>();
+			parents = new LinkedList<HyperEdge>();
 
 			this.name = name;
 			this.weight = weight;
@@ -809,7 +803,7 @@ public class HyperGraph
 		@Override
 		public int hashCode()
 		{
-			return super.hashCode();
+			return name.hashCode();
 		}
 
 		@Override

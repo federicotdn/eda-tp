@@ -6,6 +6,7 @@ import java.io.IOException;
 import main.GraphLoader;
 import main.GraphSaver;
 import main.HyperGraph;
+import main.InvalidTimeException;
 import main.algorithms.MinimumPathApproxAlgorithm;
 import main.algorithms.MinimumPathExactAlgorithm;
 
@@ -85,6 +86,10 @@ public class GraphSolver
 			catch (NumberFormatException e) 
 			{
 				System.out.println("Error: \"" + args[2] + "\" no es una cantidad de segundos valida.");
+				return;
+			}
+			catch (InvalidTimeException e) {
+				System.out.println(e.getMessage());
 				return;
 			}
 		}
