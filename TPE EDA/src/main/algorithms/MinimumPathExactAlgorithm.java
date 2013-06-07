@@ -3,6 +3,8 @@ package main.algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import main.EdgeSet;
 import main.HyperGraph;
@@ -79,10 +81,10 @@ public class MinimumPathExactAlgorithm
 		current.setParent(min);
 	}
 
-	private static ArrayList<ArrayList<HyperEdge>> generateParents(
+	private static List<List<HyperEdge>> generateParents(
 			HashSet<Node> nodes, HashSet<HyperEdge> base)
 	{
-		ArrayList<ArrayList<HyperEdge>> parents = new ArrayList<ArrayList<HyperEdge>>();
+		List<List<HyperEdge>> parents = new ArrayList<List<HyperEdge>>();
 
 		for (Node node : nodes)
 		{
@@ -136,7 +138,7 @@ public class MinimumPathExactAlgorithm
 
 		Node[] nodesArray = new Node[nodes.size()];
 
-		ArrayList<ArrayList<HyperEdge>> parents = generateParents(nodes, base);
+		List<List<HyperEdge>> parents = generateParents(nodes, base);
 
 		HyperEdge[] aux = new HyperEdge[parents.size()];
 
@@ -148,7 +150,7 @@ public class MinimumPathExactAlgorithm
 	}
 
 	private static void parentCombinations(
-			ArrayList<ArrayList<HyperEdge>> parents, int index,
+			List<List<HyperEdge>> parents, int index,
 			HyperEdge[] combination, HashSet<EdgeSet> combinations,
 			HashSet<HyperEdge> base)
 	{
@@ -161,7 +163,7 @@ public class MinimumPathExactAlgorithm
 			return;
 		}
 
-		ArrayList<HyperEdge> edges = parents.get(index);
+		List<HyperEdge> edges = parents.get(index);
 
 		for (HyperEdge edge : edges)
 		{

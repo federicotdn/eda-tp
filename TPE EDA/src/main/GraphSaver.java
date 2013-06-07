@@ -32,7 +32,7 @@ public class GraphSaver
 
 		}
 
-		for (HyperEdge hEdge : hGraph.hEdges)
+		for (HyperEdge hEdge : hGraph.hyperEdges)
 		{
 			writer.write("\"" + hEdge.name
 					+ "\"[shape=box, height=0.18, fontsize=12, label=\""
@@ -72,7 +72,7 @@ public class GraphSaver
 		
 		boolean first = true;
 	
-		for (HyperEdge edge : graph.hEdges)
+		for (HyperEdge edge : graph.hyperEdges)
 		{		
 			if (edge.visited)
 			{
@@ -142,7 +142,7 @@ public class GraphSaver
 		}
 
 
-		for (HyperEdge hEdge : hGraph.hEdges)
+		for (HyperEdge hEdge : hGraph.hyperEdges)
 		{
 			if (!hEdge.visited)
 			{
