@@ -7,9 +7,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+import javax.naming.TimeLimitExceededException;
+
 import main.HyperGraph;
 import main.HyperGraph.HyperEdge;
 import main.HyperGraph.Node;
+import main.InvalidTimeException;
 
 public class MinimumPathApproxAlgorithm
 {
@@ -23,8 +26,13 @@ public class MinimumPathApproxAlgorithm
 
 	private static long maxTime;
 	
-	public static double execute(HyperGraph hyperGraph, int maxTimeSeg)
+	public static double execute(HyperGraph hyperGraph, int maxTimeSeg) throws InvalidTimeException
 	{
+		if(maxTimeSeg < 0){
+			throw new InvalidTimeException("El tiempo no puede ser negativo");
+		}
+
+		
 		graph = hyperGraph;
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
@@ -34,8 +42,11 @@ public class MinimumPathApproxAlgorithm
 		minDistance = firstResult.edgePath.totalWeight;
 		minPath = firstResult.edgePath.path;
 		
+		if(firstResult == null){
+			throw new  InvalidTimeException("El intervalo de tiempo es demasiado chico");
+		}
 		getBetterMinPath(firstResult);
-		
+	
 		return minDistance;
 	}
 	
