@@ -11,7 +11,7 @@ import main.HyperGraph.Node;
  * La clase EdgeSet modela un conjunto de ejes de un hipergrafo.  Se utiliza en el algoritmo exacto para manipular
  * grupos de ejes.
  * 
- * EdgeSet posee tres variables: <code>edges</code>, un HashSet donde se almacenan los ejes del conjunto,
+ * <p>EdgeSet posee tres variables: <code>edges</code>, un HashSet donde se almacenan los ejes del conjunto,
  *  <code>totalWeight</code>, que representa el peso sumado de los ejes del conjunto mas el peso de <code>parent</code>, la 
  *  tercera variable, que representa al conjunto de ejes superior.
  *

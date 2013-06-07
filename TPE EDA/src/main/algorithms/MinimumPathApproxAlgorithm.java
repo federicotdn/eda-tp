@@ -35,6 +35,9 @@ public class MinimumPathApproxAlgorithm
 	 * El metodo <code>execute</code> es el unico metodo publico de la clase, que es usado por el front-end 
 	 * para realizar un calculo de camino minimo sobre un grafo.
 	 * 
+	 * <p>El metodo <code>execute</code> llama a <code>bestFirstSearch</code> para obtener un camino aproximado inicial,
+	 * y luego a <code>getBetterMinPath</code> para mejorarlo.
+	 * 
 	 * @param hyperGraph - Hipergrafo donde se busacara un camino minimo.
 	 * @param maxTimeSeg - Tiempo maximo en segundos en la que el algoritmo puede correr.
 	 * @return Peso del camino calculado.  Los ejes y nodos del camino quedan con <code>visited = true</code>.
@@ -69,6 +72,10 @@ public class MinimumPathApproxAlgorithm
 		return minWeight;
 	}
 
+	/**
+	 * 
+	 * 
+	 */
 	private static void getBetterMinPath()
 	{
 
@@ -86,14 +93,13 @@ public class MinimumPathApproxAlgorithm
 		int maxPaths = maxNumberOfPaths();
 
 		current = minPath;
-		
-
 
 		Iterator<HyperEdge> it = minPath.iterator();
 
 		while ((System.currentTimeMillis() - startingTime) < maxTime)
 		{
 			taboos = new ArrayList<HyperEdge>();
+			
 			if (!it.hasNext())
 			{
 				if (numberOfTaboos >= current.size())
@@ -142,7 +148,6 @@ public class MinimumPathApproxAlgorithm
 				pathCount = 0;
 			}
 			pathCount++;
-
 		}
 	}
 
@@ -154,11 +159,28 @@ public class MinimumPathApproxAlgorithm
 		}
 	}
 
+	/**
+	 * El metodo <code>bestFirstSearch</code> es el centro del algoritmo aproximado.  
+	 * 
+	 * <p>Comienza creando un PriorityQueue de 
+	 * hiperejes, para aplicar un algorimto similar al algoritmo de Dijkstra.  Se remueve un eje de la cola (el de menor peso), 
+	 * se marca como visitado y se marca tambien como visitados todos los nodos hijos.  A la vez, se accede a todos los
+	 * ejes hijos de dichos nodos mencionados, y se agrega una referencia <code>parent</code> al eje removido.  Cuando
+	 * un eje tiene todos sus nodos padre visitados, se aplica al eje una heuristica que permite eliminar padres innecesarios, y se 
+	 * agrega a la lista de prioridades, utilizando la clase <code>EdgePath</code> para calcular el peso total del camino que
+	 * lleva a ese eje.
+	 * 
+	 * @return El ultimo eje del camino calculado (contiene referencias a los demas ejes del camino).
+	 */
 	private static HyperEdge bestFirstSearch()
 	{
 
 		HyperEdge edge = null;
 
+		//Lista de prioridades.  Almacena HyperEdge, y los compara utilizando el valor weight
+		//de sus respectivas variables path.  La variable path representa el camino construido para 
+		//llegar a cierto eje.
+		
 		PriorityQueue<HyperEdge> hq = new PriorityQueue<HyperEdge>(
 				graph.hyperEdges.size(), new Comparator<HyperEdge>() {
 					@Override
@@ -168,10 +190,14 @@ public class MinimumPathApproxAlgorithm
 								edge2.edgePath.totalWeight);
 					}
 				});
-
+		
+		//Se agregan todos los ejes iniciales (hijos del nodo origen)
+		
 		for (HyperEdge topEdge : graph.start.head)
 		{
 			topEdge.calculatePathDistance();
+			
+			//Se ignoran ejes taboo
 			if (!topEdge.isTaboo)
 			{
 				hq.offer(topEdge);
@@ -180,6 +206,7 @@ public class MinimumPathApproxAlgorithm
 
 		while (!hq.isEmpty())
 		{
+			//Si no hay tiempo, se devuelve null
 			if ((System.currentTimeMillis() - startingTime) > maxTime)
 			{
 				return null;
@@ -189,18 +216,14 @@ public class MinimumPathApproxAlgorithm
 
 			if (edge.isBottom)
 			{
+				//Se llego al destino
 				return edge;
-
 			}
-			procesEdge(edge, hq);
-
+			
+			processEdge(edge, hq);
 		}
 
 		return null;
-
-		// me queda hEdge con el camino para arriba
-		// marcar ejes del camino
-
 	}
 
 	private static HyperEdge pickRandomEdge(HashSet<HyperEdge> set)
@@ -223,7 +246,19 @@ public class MinimumPathApproxAlgorithm
 		graph.clearEdges();
 	}
 
-	private static void procesEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
+	/**
+	 * El metodo <code>processEdge</code> se encarga de procesar ejes individuales seleccionados por el 
+	 * metodo <code>bestFirstSearch()</code>.
+	 * 
+	 * <p>Primero, por cada nodo hijo no visitado de hEdge, se marca como <code>visited</code>.  Por cada nodo visitado,
+	 * se agrega a cada eje hijo EDGE de dicho nodo una referencia a hEdge.  De esta forma, se "visita" una vez a EDGE.  Si
+	 * la cantidad de "visitas" que tiene EDGE concuerda con su cantidad de nodos cola, entonces se procesa EDGE, y se lo
+	 * agrega a la cola de prioridades.
+	 * 
+	 * @param hEdge - El eje al que se analizara los nodos hijos, y respectivos ejes hijos.
+	 * @param hq - Cola de prioridades utilizada por <code>bestFirstSearch()</code>.
+	 */
+	private static void processEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
 	{
 		for (Node node : hEdge.head)
 		{
@@ -233,11 +268,15 @@ public class MinimumPathApproxAlgorithm
 
 				for (HyperEdge edge : node.head)
 				{
+					//Se ignoran ejes taboo
 					if (!edge.isTaboo)
 					{
+						//Se aumenta por uno la variable currentEntriesCount de edge
 						edge.addVisitor();
+						
 						edge.parents.add(hEdge);
-
+						
+						//Si el eje esta completamente visitado:
 						if (edge.currentEntriesCount == edge.tail.size())
 						{
 							removeUnnecesaryParents(edge);
@@ -252,6 +291,13 @@ public class MinimumPathApproxAlgorithm
 
 	}
 
+	/**
+	 * El metodo <code>removeUnnecesaryParents</code> se encarga de que un eje listo para agregar a la cola de prioridades
+	 * no tenga ejes <code>parent</code> innecesarios.  Se remueven todos las referencias a ejes <code>parent</code> posibles,
+	 * asegurandose de que cada nodo padre de hEdge esté siendo habilitado por algun eje padre.
+	 * 
+	 * @param hEdge - Eje a procesar para remover padres innecesarios.
+	 */
 	private static void removeUnnecesaryParents(HyperEdge hEdge)
 	{
 
@@ -316,6 +362,12 @@ public class MinimumPathApproxAlgorithm
 		return neighbour;
 	}
 
+	/**
+	 * Recorre un conjunto de HyperEdge, seteando la variable <code>visited</code> de cada eje como true, asi tambien
+	 * como todos los nodos cola.  Esto efectivamente marca todos los elementos de un camino de ejes y nodos.
+	 * 
+	 * @param set
+	 */
 	private static void markPath(HashSet<HyperEdge> set)
 	{
 
@@ -330,6 +382,14 @@ public class MinimumPathApproxAlgorithm
 
 	}	
 
+	/**
+	 * Los metodos addParentToChildren, substractParentToChildren y hasMissingParents componen el sistema
+	 * que permite eliminar a un eje padres innecesarios.  Se toma a un eje hEdge, y por cada eje <code>parent</code>
+	 * se envia el mensaje substractParentToChildren.  Si la variable tempParentCount de uno de esos nodos llega a 0, quiere
+	 * decir que dicho eje es necesario para poder habilitar hEdge.
+	 * 
+	 * @param edge - Uno de los ejes <code>parent</code> del eje que se esta analizando.
+	 */
 	public static void addParentToChildren(HyperEdge edge)
 	{
 
@@ -339,6 +399,10 @@ public class MinimumPathApproxAlgorithm
 		}
 	}
 
+	/**
+	 * Ver <code>addParentToChildren.</code>
+	 *
+	 */
 	public static void substractParentToChildren(HyperEdge edge)
 	{
 
@@ -348,6 +412,9 @@ public class MinimumPathApproxAlgorithm
 		}
 	}
 
+	/**
+	 * Ver <code>addParentToChildren.</code>
+	 */
 	public static boolean hasMissingParents(HyperEdge edge)
 	{
 

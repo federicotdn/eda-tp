@@ -8,10 +8,10 @@ import main.HyperGraph.HyperEdge;
 /**
  * La clase EdgePath modela un camino conformado de ejes de tipo HyperEdge.
  * 
- * La clase cuenta con dos variables: <code>path</code>, un HashSet donde se guardan los ejes que componen el
+ * <p>La clase cuenta con dos variables: <code>path</code>, un HashSet donde se guardan los ejes que componen el
  * camino, y <code>totalWeight</code>, donde se guarda el peso total del camino sumado.
  * 
- * Ésta clase se utiliza en el algoritmo aproximado, ya que permite guardar en cada eje informacion que representa
+ * <p>Ésta clase se utiliza en el algoritmo aproximado, ya que permite guardar en cada eje informacion que representa
  * un camino valido posible que lleva a dicho eje.
  * 
  */
