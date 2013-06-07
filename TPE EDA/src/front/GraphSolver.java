@@ -6,6 +6,8 @@ import java.io.IOException;
 import main.GraphLoader;
 import main.GraphSaver;
 import main.HyperGraph;
+import main.algorithms.MinimumPathApproxAlgorithm;
+import main.algorithms.MinimumPathExactAlgorithm;
 
 public class GraphSolver
 {
@@ -15,7 +17,10 @@ public class GraphSolver
 	public static void main(String[] args)
 	{
 		if (args.length < 2 || args.length > 3)
+		{
 			printInstructions();
+			return;
+		}
 		
 		String graphName = args[0];
 		HyperGraph graph = null;
@@ -37,23 +42,29 @@ public class GraphSolver
 		
 		String solveMode = args[1];
 		
-		if (solveMode == exactArg)
+		if (solveMode.equals(exactArg))
 		{
+			System.out.println("Calculando...");
+			
 			//LLamar al algoritmo exacto
-			double result = graph.minimumPathExact();
+			double result = MinimumPathExactAlgorithm.execute(graph);
 			System.out.println("El camino minimo pesa: " + result);
 		}
-		else if (solveMode == approxArg)
+		else if (solveMode.equals(approxArg))
 		{
 			if (args.length != 3)
+			{
 				printInstructions();
+				return;
+			}
 			
 			try
 			{
 				int seconds = Integer.valueOf(args[2]);
 				//LLamar al algoritmo aproximado
 				
-				double result = graph.minimumPathApprox(seconds);
+				System.out.println("Calculando...");
+				double result = MinimumPathApproxAlgorithm.execute(graph, seconds);
 				System.out.println("El camino minimo es (aproximadamente): " + result);
 				
 			}
