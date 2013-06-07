@@ -28,6 +28,7 @@ public class GraphSolver
 		try
 		{
 			graph = GraphLoader.loadGraph(graphName);
+			System.out.println("Archivo \"" + graphName + "\" cargado.");
 		}
 		catch (FileNotFoundException e)
 		{

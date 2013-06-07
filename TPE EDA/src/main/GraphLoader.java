@@ -151,8 +151,6 @@ public class GraphLoader
 			graph.hEdges.add(edge);
 		}
 		
-		System.out.println("Grafo " + graphName + ".hg cargado.");
-		
 		reader.close();
 		fileinput.close();
 
