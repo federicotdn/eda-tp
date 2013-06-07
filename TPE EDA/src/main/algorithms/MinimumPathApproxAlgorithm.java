@@ -51,7 +51,7 @@ public class MinimumPathApproxAlgorithm
 		getBetterMinPath();
 		graph.end.visited = true;
 		markPath(minPath);
-		
+
 		return minWeight;
 	}
 
@@ -69,18 +69,11 @@ public class MinimumPathApproxAlgorithm
 		int numberOfTaboos = 1;
 		int i = 0;
 		int pathCount = 0;
-		int maxPaths = 0;
+		int maxPaths = maxNumberOfPaths();
 
 		current = minPath;
+		
 
-		for (HyperEdge e : graph.hyperEdges)
-		{
-			maxPaths += e.head.size();
-		}
-		for (Node node : graph.nodes)
-		{
-			maxPaths += node.head.size();
-		}
 
 		Iterator<HyperEdge> it = minPath.iterator();
 
@@ -138,7 +131,6 @@ public class MinimumPathApproxAlgorithm
 
 		}
 
-		
 		// System.out.println(minDistance);
 		// System.out.println((double) (System.currentTimeMillis() -
 		// startingTime)
@@ -197,12 +189,9 @@ public class MinimumPathApproxAlgorithm
 		}
 
 		return null;
-		
 
 		// me queda hEdge con el camino para arriba
 		// marcar ejes del camino
-
-		
 
 	}
 
@@ -502,6 +491,22 @@ public class MinimumPathApproxAlgorithm
 		}
 
 		return false;
+	}
+
+	private static int maxNumberOfPaths()
+	{
+		int maxPaths = 0;
+		for (HyperEdge e : graph.hyperEdges)
+		{
+			maxPaths += e.head.size();
+		}
+		
+		for (Node node : graph.nodes)
+		{
+			maxPaths += node.head.size();
+		}
+		
+		return maxPaths;
 	}
 
 }
