@@ -61,10 +61,20 @@ public class HyperGraph
 		return nodes;
 	}
 
-	private void clearNodeMarks()
+	public void clearNodeMarks()
 	{
 		for (Node node : nodes)
 			node.visited = false;
+	}
+	
+	public  void clearEdges()
+	{
+		for (HyperEdge edge : hEdges)
+		{
+			edge.path = null;
+			edge.parents = new ArrayList<HyperEdge>();
+			edge.currentEntriesCount = 0;
+		}
 	}
 
 	// ----------------Algoritmo Exacto---------------------------------------
@@ -85,6 +95,7 @@ public class HyperGraph
 		}
 
 		markEdgeSetPath(min);
+		end.visited = true;
 		
 		return min.getTotalWeight();
 		
@@ -151,11 +162,13 @@ public class HyperGraph
 			}
 		}
 
-		int i = 0;
 		for (Node node : nodes)
 			if (!node.visited)
 			{
 				parents.add(node.tail);
+
+			}
+			else{
 				node.visited = false;
 
 			}
@@ -330,15 +343,7 @@ public class HyperGraph
 		clearEdges();
 	}
 
-	private void clearEdges()
-	{
-		for (HyperEdge edge : hEdges)
-		{
-			edge.path = null;
-			edge.parents = new ArrayList<HyperEdge>();
-			edge.currentEntriesCount = 0;
-		}
-	}
+	
 
 	private void improvePath(HyperEdge last)
 	{
