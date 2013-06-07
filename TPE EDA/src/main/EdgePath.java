@@ -9,8 +9,8 @@ import main.HyperGraph.HyperEdge;
 
 public class EdgePath implements Iterable<HyperEdge>
 {
-	private HashSet<HyperEdge> path;
-	private double totalWeight;
+	public HashSet<HyperEdge> path;
+	public double totalWeight;
 	
 	public EdgePath(HyperEdge initial)
 	{
@@ -28,13 +28,7 @@ public class EdgePath implements Iterable<HyperEdge>
 	public void addEdge(HyperEdge edge)
 	{
 		if (path.add(edge))
-			totalWeight += edge.weight();
-	}
-	
-	public void markPath()
-	{
-		for (HyperEdge edge : path)
-			edge.setAsVisited();
+			totalWeight += edge.weight;
 	}
 	
 	public void mergeWith(EdgePath other)
@@ -42,22 +36,14 @@ public class EdgePath implements Iterable<HyperEdge>
 		for (HyperEdge edge : other)
 		{
 			if (path.add(edge))
-				totalWeight += edge.weight();
+				totalWeight += edge.weight;
 		}
 	}
 	
-	public double distance()
-	{
-		return totalWeight;
-	}
-
 	@Override
 	public Iterator<HyperEdge> iterator()
 	{
 		return path.iterator();
 	}
-	
-	public HashSet<HyperEdge> getPath(){
-		return this.path;
-	}
+
 }

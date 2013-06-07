@@ -11,34 +11,31 @@ import main.HyperGraph.Node;
 
 public class EdgeSet implements Iterable<HyperEdge>
 {
-	private HashSet<HyperEdge> edges;
-	private double totalWeight;
-	private EdgeSet parent;
+	public HashSet<HyperEdge> edges;
+	public double totalWeight;
+	public EdgeSet parent;
 
 	public EdgeSet(HyperEdge[] edges)
 	{
 		this.edges = new HashSet<HyperEdge>();
-		
+
 		for (HyperEdge e : edges)
-			if (this.edges.add(e))
-				this.totalWeight += e.weight();
+			if (this.edges.add(e)) this.totalWeight += e.weight;
 	}
 
 	public EdgeSet(HyperEdge edge)
 	{
 		edges = new HashSet<HyperEdge>();
 		edges.add(edge);
-		totalWeight = edge.weight();
+		totalWeight = edge.weight;
 	}
 
 	public void setParent(EdgeSet parent)
 	{
+		if(parent != null){
 		totalWeight += parent.totalWeight;
 		this.parent = parent;
-	}
-	
-	public EdgeSet getParent(){
-		return parent;
+		}
 	}
 
 	@Override
@@ -60,20 +57,16 @@ public class EdgeSet implements Iterable<HyperEdge>
 		return edges.equals(aux.edges);
 	}
 
-	public double getTotalWeight()
-	{
-		return totalWeight;
-	}
 
 	public boolean isTop()
 	{
-		//Horrible, cambiar o sacar
-		
-		List<Node> tail = edges.iterator().next().tail();
+		// Horrible, cambiar o sacar
+
+		List<Node> tail = edges.iterator().next().tail;
 		if (tail.size() == 1)
 		{
 			Node aux = tail.get(0);
-			if (aux.tail().isEmpty())
+			if (aux.tail.isEmpty())
 			{
 				return true;
 			}
@@ -87,16 +80,10 @@ public class EdgeSet implements Iterable<HyperEdge>
 		return edges.toString() + " " + totalWeight;
 	}
 
-	
 	public void addBase(HashSet<HyperEdge> base)
 	{
 		for (HyperEdge edge : base)
-			if (this.edges.add(edge))
-				this.totalWeight += edge.weight();
+			if (this.edges.add(edge)) this.totalWeight += edge.weight;
 	}
-	
-	public HashSet<HyperEdge> edges()
-	{
-		return edges;
-	}
+
 }

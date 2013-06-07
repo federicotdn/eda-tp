@@ -41,25 +41,6 @@ public class HyperGraph
 		nodes = new ArrayList<Node>();
 	}
 
-	public Node start()
-	{
-		return start;
-	}
-
-	public Node end()
-	{
-		return end;
-	}
-
-	public List<HyperEdge> edges()
-	{
-		return hEdges;
-	}
-
-	public List<Node> nodes()
-	{
-		return nodes;
-	}
 
 	public void clearNodeMarks()
 	{
@@ -71,7 +52,7 @@ public class HyperGraph
 	{
 		for (HyperEdge edge : hEdges)
 		{
-			edge.path = null;
+			edge.edgePath = null;
 			edge.parents = new ArrayList<HyperEdge>();
 			edge.currentEntriesCount = 0;
 		}
@@ -89,7 +70,7 @@ public class HyperGraph
 
 			minimumPathExact(aux);
 
-			if (min == null || aux.getTotalWeight() < min.getTotalWeight())
+			if (min == null || aux.totalWeight < min.totalWeight)
 				min = aux;
 
 		}
@@ -97,7 +78,7 @@ public class HyperGraph
 		markEdgeSetPath(min);
 		end.visited = true;
 		
-		return min.getTotalWeight();
+		return min.totalWeight;
 		
 	}
 
@@ -134,7 +115,7 @@ public class HyperGraph
 				sample = visited.get(hash);
 			}
 
-			if (min == null || (sample.getTotalWeight() < min.getTotalWeight()))
+			if (min == null || (sample.totalWeight < min.totalWeight))
 			{
 				min = sample;
 			}
@@ -173,9 +154,7 @@ public class HyperGraph
 
 			}
 		
-		for(HyperEdge edge: base){
-			edge.setChildrenVisited(false);
-		}
+		
 
 		return parents;
 	}
@@ -244,8 +223,8 @@ public class HyperGraph
 			return;
 		}
 
-		markHashPath(set.edges());
-		markEdgeSetPath(set.getParent());
+		markHashPath(set.edges);
+		markEdgeSetPath(set.parent);
 
 	}
 
@@ -264,8 +243,8 @@ public class HyperGraph
 					@Override
 					public int compare(HyperEdge edge1, HyperEdge edge2)
 					{
-						return Double.compare(edge1.path.distance(),
-								edge2.path.distance());
+						return Double.compare(edge1.edgePath.totalWeight,
+								edge2.edgePath.totalWeight);
 					}
 				});
 
@@ -316,8 +295,8 @@ public class HyperGraph
 		startingTime = System.currentTimeMillis();
 
 		HyperEdge edge = bestFirstSearch(start, end);
-		this.minDistance = edge.path.distance();
-		this.minPath = edge.path.getPath();
+		this.minDistance = edge.edgePath.totalWeight;
+		this.minPath = edge.edgePath.path;
 
 		improvePath(edge);
 
@@ -353,7 +332,7 @@ public class HyperGraph
 	{
 		HyperEdge edge;
 		HyperEdge result = null;
-		HashSet<HyperEdge> current = last.path.getPath();
+		HashSet<HyperEdge> current = last.edgePath.path;
 		HashSet<HyperEdge> previous = null;
 		HashSet<HyperEdge> taboo = new HashSet<HyperEdge>();
 
@@ -375,10 +354,10 @@ public class HyperGraph
 			resetGraph();
 
 			result = bestFirstSearch(start, end);
-			if (result != null && (result.path.distance() < minDistance))
+			if (result != null && (result.edgePath.totalWeight < minDistance))
 			{
-				minDistance = result.path.distance();
-				minPath = result.path.getPath();
+				minDistance = result.edgePath.totalWeight;
+				minPath = result.edgePath.path;
 				current = minPath;
 			}
 
@@ -389,7 +368,7 @@ public class HyperGraph
 				current = null;
 			} else
 			{
-				current = result.path.getPath();
+				current = result.edgePath.path;
 			}
 
 		}
@@ -475,8 +454,8 @@ public class HyperGraph
 
 		int count = 0;
 
-		this.minDistance = edge.path.distance();
-		this.minPath = edge.path.getPath();
+		this.minDistance = edge.edgePath.totalWeight;
+		this.minPath = edge.edgePath.path;
 		current = minPath;
 
 		// resetGraph();
@@ -503,10 +482,10 @@ public class HyperGraph
 			resetGraph();
 			result = bestFirstSearch(start, end);
 
-			if (result != null && (result.path.distance() < minDistance))
+			if (result != null && (result.edgePath.totalWeight < minDistance))
 			{
-				minDistance = result.path.distance();
-				minPath = result.path.getPath();
+				minDistance = result.edgePath.totalWeight;
+				minPath = result.edgePath.path;
 				it = minPath.iterator();
 				current = minPath;
 
@@ -557,7 +536,7 @@ public class HyperGraph
 
 			if (result != null)
 			{
-				neighbour = result.path.getPath();
+				neighbour = result.edgePath.path;
 			}
 
 			resetGraph();
@@ -598,8 +577,8 @@ public class HyperGraph
 		int count = 0;
 		int maxC = 0;
 
-		this.minDistance = edge.path.distance();
-		this.minPath = edge.path.getPath();
+		this.minDistance = edge.edgePath.totalWeight;
+		this.minPath = edge.edgePath.path;
 		current = minPath;
 
 		for (HyperEdge e : hEdges)
@@ -644,10 +623,10 @@ public class HyperGraph
 			resetGraph();
 			result = bestFirstSearch(start, end);
 
-			if (result != null && (result.path.distance() < minDistance))
+			if (result != null && (result.edgePath.totalWeight < minDistance))
 			{
-				minDistance = result.path.distance();
-				minPath = result.path.getPath();
+				minDistance = result.edgePath.totalWeight;
+				minPath = result.edgePath.path;
 				it = minPath.iterator();
 				current = minPath;
 				numberOfTaboos = 1;
@@ -777,7 +756,7 @@ public class HyperGraph
 		public String name;
 		public final double weight;
 
-		public EdgePath path;
+		public EdgePath edgePath;
 		public boolean visited;
 		public int currentEntriesCount;
 		public boolean isTaboo;
@@ -802,31 +781,17 @@ public class HyperGraph
 			currentEntriesCount = 0;
 		}
 
-		public ArrayList<Node> tail()
-		{
-			return tail;
-		}
-
-		public ArrayList<Node> head()
-		{
-			return head;
-		}
-
-		public double weight()
-		{
-			return weight;
-		}
 
 		public void calculatePathDistance()
 		{
-			if (this.path == null)
+			if (this.edgePath == null)
 			{
-				this.path = new EdgePath(this);
+				this.edgePath = new EdgePath(this);
 			}
 
 			for (HyperEdge parent : this.parents)
 			{
-				this.path.mergeWith(parent.path);
+				this.edgePath.mergeWith(parent.edgePath);
 			}
 		}
 
@@ -835,28 +800,10 @@ public class HyperGraph
 			currentEntriesCount++;
 		}
 
-		public void setAsTop()
-		{
-			isTop = true;
-		}
-
-		public ArrayList<HyperEdge> parents()
-		{
-			return parents;
-		}
-
 		public void setChildrenVisited(boolean value)
 		{
 			for (Node node : head)
 				node.visited = value;
-		}
-		
-		
-
-
-		public void setAsVisited()
-		{
-			visited = true;
 		}
 
 		@Override
@@ -871,14 +818,6 @@ public class HyperGraph
 			return "[" + name + ", " + weight + "]";
 		}
 
-		public void setAsBottom()
-		{
-			isBottom = true;
-		}
 
-		public boolean getVisited()
-		{
-			return visited;
-		}
 	}
 }

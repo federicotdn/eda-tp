@@ -12,14 +12,13 @@ import main.HyperGraph.Node;
 public class MinimumPathExactAlgorithm
 {
 	private static HyperGraph graph;
-	
+
 	private static HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
 
-	
 	public static double execute(HyperGraph hyperGraph)
 	{
 		graph = hyperGraph;
-		
+
 		EdgeSet min = null;
 
 		for (HyperEdge edge : graph.end.tail)
@@ -28,17 +27,17 @@ public class MinimumPathExactAlgorithm
 
 			minimumPathExact(aux);
 
-			if (min == null || aux.getTotalWeight() < min.getTotalWeight())
+			if (min == null || aux.totalWeight < min.totalWeight)
 				min = aux;
 
 		}
 
 		markPath(min);
-		
-		return min.getTotalWeight();
-		
-	}
+		graph.end.visited = true;
 
+		return min.totalWeight;
+
+	}
 
 	private static void minimumPathExact(EdgeSet current)
 	{
@@ -71,7 +70,7 @@ public class MinimumPathExactAlgorithm
 				sample = visited.get(hash);
 			}
 
-			if (min == null || (sample.getTotalWeight() < min.getTotalWeight()))
+			if (min == null || (sample.totalWeight < min.totalWeight))
 			{
 				min = sample;
 			}
@@ -94,7 +93,7 @@ public class MinimumPathExactAlgorithm
 				if (!base.contains(auxEdge))
 				{
 					base.add(auxEdge);
-					auxEdge.setChildrenVisited();
+					auxEdge.setChildrenVisited(true);
 				}
 			}
 		}
@@ -107,6 +106,11 @@ public class MinimumPathExactAlgorithm
 				node.visited = false;
 
 			}
+
+		for (HyperEdge edge : base)
+		{
+			edge.setChildrenVisited(false);
+		}
 
 		return parents;
 	}
@@ -143,8 +147,9 @@ public class MinimumPathExactAlgorithm
 		return combinations;
 	}
 
-	private static void parentCombinations(ArrayList<ArrayList<HyperEdge>> parents,
-			int index, HyperEdge[] combination, HashSet<EdgeSet> combinations,
+	private static void parentCombinations(
+			ArrayList<ArrayList<HyperEdge>> parents, int index,
+			HyperEdge[] combination, HashSet<EdgeSet> combinations,
 			HashSet<HyperEdge> base)
 	{
 		if (index == parents.size())
@@ -174,16 +179,17 @@ public class MinimumPathExactAlgorithm
 		{
 			return;
 		}
-		
+
 		for (HyperEdge edge : set)
 		{
 			edge.visited = true;
-			for(Node node: edge.tail){
+			for (Node node : edge.tail)
+			{
 				node.visited = true;
 			}
 		}
-		
-		markPath(set.getParent());
+
+		markPath(set.parent);
 
 	}
 }
