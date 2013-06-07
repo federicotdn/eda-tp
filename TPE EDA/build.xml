@@ -15,7 +15,7 @@
 	</target>
 
 	<!-- Crea el jar ejecutable con todo el proyecto compilado. -->
-	<target name="dist" depends="compile, doc, tests">
+	<target name="dist" depends="compile, doc">
 		<jar destfile="HyperGraphSolver.jar" basedir="bin">
 			<manifest>
 				<attribute name="Main-Class" value="front.GraphSolver" />
