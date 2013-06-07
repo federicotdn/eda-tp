@@ -1,7 +1,0 @@
-start
-end
-A 3 1 s 1 start
-B 4 2 u v 1 start
-C 1 1 t 1 s
-D 2 1 end 2 t u
-E 5 1 end 1 v
