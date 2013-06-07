@@ -34,6 +34,7 @@ public class MinimumPathApproxAlgorithm
 		minDistance = firstResult.edgePath.totalWeight;
 		minPath = firstResult.edgePath.path;
 		
+		getBetterMinPath(firstResult);
 		
 		return minDistance;
 	}
