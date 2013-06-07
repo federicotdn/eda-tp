@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import main.GraphLoader;
+import main.GraphSaver;
 import main.HyperGraph;
 
 public class GraphSolver
@@ -56,15 +57,26 @@ public class GraphSolver
 				System.out.println("El camino minimo es (aproximadamente): " + result);
 				
 			}
-			catch(NumberFormatException e) 
+			catch (NumberFormatException e) 
 			{
 				System.out.println("Error: \"" + args[2] + "\" no es una cantidad de segundos valida.");
 				return;
 			}
 		}
 		else
+		{
 			printInstructions();
+			return;
+		}
 		
+		try
+		{
+			GraphSaver.createGraphFiles(graph);
+		}
+		catch (IOException e)
+		{
+			System.out.println("Error al intentar crear los archivos.");
+		}
 	}
 	
 	private static void printInstructions()

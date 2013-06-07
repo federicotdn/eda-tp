@@ -102,13 +102,13 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					graph.nodes().add(aux);
+					graph.nodes.add(aux);
 				}
 
-				edge.head().add(aux);
+				edge.head.add(aux);
 			}
 
-			for (Node node : edge.head())
+			for (Node node : edge.head)
 			{
 				node.tail().add(edge);
 			}
@@ -134,20 +134,21 @@ public class GraphLoader
 					aux = new Node(nodeName);
 
 					nodes.put(nodeName, aux);
-					graph.nodes().add(aux);
+					graph.nodes.add(aux);
 				}
 
-				edge.tail().add(aux);
+				edge.tail.add(aux);
 
-				if (aux == start) edge.setAsTop();
+				if (aux == start) 
+					edge.isTop = true;
 			}
 
-			for (Node node : edge.tail())
+			for (Node node : edge.tail)
 			{
 				node.head().add(edge);
 			}
 
-			graph.edges().add(edge);
+			graph.hEdges.add(edge);
 		}
 		
 		System.out.println("Grafo " + graphName + ".hg cargado.");
