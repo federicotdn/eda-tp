@@ -60,9 +60,16 @@ public class GraphSolver
 			System.out.println("Calculando...");
 			
 			//Se llama al algoritmo exacto, y se imprime el peso del camino.
-			
-			double result = MinimumPathExactAlgorithm.execute(graph);
-			System.out.println("El camino minimo pesa: " + result);
+			try
+			{
+				double result = MinimumPathExactAlgorithm.execute(graph);
+				System.out.println("El camino minimo pesa: " + result);
+			}
+			catch (OutOfMemoryError e)
+			{
+				System.out.println("Error: memoria insuficiente");
+				return;
+			}
 		}
 		else if (solveMode.equals(approxArg))
 		{
