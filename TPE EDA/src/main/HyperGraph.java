@@ -157,7 +157,7 @@ public class HyperGraph
 				if (!base.contains(auxEdge))
 				{
 					base.add(auxEdge);
-					auxEdge.setChildrenVisited();
+					auxEdge.setChildrenVisited(true);
 				}
 			}
 		}
@@ -172,6 +172,10 @@ public class HyperGraph
 				node.visited = false;
 
 			}
+		
+		for(HyperEdge edge: base){
+			edge.setChildrenVisited(false);
+		}
 
 		return parents;
 	}
@@ -841,11 +845,14 @@ public class HyperGraph
 			return parents;
 		}
 
-		public void setChildrenVisited()
+		public void setChildrenVisited(boolean value)
 		{
 			for (Node node : head)
-				node.visited = true;
+				node.visited = value;
 		}
+		
+		
+
 
 		public void setAsVisited()
 		{
