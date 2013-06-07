@@ -11,6 +11,10 @@ import java.util.LinkedList;
 import main.HyperGraph.HyperEdge;
 import main.HyperGraph.Node;
 
+/**
+ * La clase <code>GraphLoader</code> es la clase encargada de cargar grafos a partir de archivos ".hg".
+ *
+ */
 public class GraphLoader
 {
 	static String errorMessageLength = "Nombres deben tener longitud 1-10.";
@@ -23,7 +27,18 @@ public class GraphLoader
 
 	final static int minTagLength = 1, maxTagLength = 10;
 	final static int minTagsPerLine = 6;
-
+	
+	
+	/**
+	 * 
+	 * El metodo <code>loadGraph</code> recibe un nombre de archivo, y crea un hipergrafo a partir de la informacion
+	 * almacenada.
+	 * 
+	 * @param filename - nombre del archivo a cargar.
+	 * @return Hipergrafo cargado.
+	 * @throws IOException si el archivo tiene formato no valido.
+	 * @throws FileNotFoundException si el archivo no existe.
+	 */
 	static public HyperGraph loadGraph(String filename) throws IOException,
 			FileNotFoundException
 	{
@@ -157,6 +172,13 @@ public class GraphLoader
 		return graph;
 	}
 
+	/**
+	 * El metodo <code>parseSingleString</code> recibe un String, y devuelve un solo nombre de nodo valido a partir del
+	 * mismo.
+	 * 
+	 * @param line - String cargado del archivo.
+	 * @throws IOException Si el nombre no es valido.
+	 */
 	private static String parseSingleTag(String line) throws IOException
 	{
 		if (line.length() < minTagLength || line.length() > maxTagLength)
@@ -167,7 +189,15 @@ public class GraphLoader
 		
 		return line;
 	}
-
+	
+	/**
+	 * Ésta funcion recibe un String, y devuelve los tags que estaban separados por espacios.  Cada tag
+	 * es parte de la descripcion de un eje (nombre, peso, nodos).
+	 * 
+	 * @param lineString - String cargado del archivo.
+	 * @return Lista de Strings, conteniendo cada tag cargado.
+	 * @throws IOException Si el archivo tiene formato no valido.
+	 */
 	private static LinkedList<String> parseMultipleTags(String lineString) throws IOException
 	{
 		LinkedList<String> tags = new LinkedList<String>();
