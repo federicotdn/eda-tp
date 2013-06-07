@@ -94,7 +94,7 @@ public class HyperGraph
 				+ ((double) System.currentTimeMillis() - lastTime) / 1000
 				+ " segundos.");
 
-		markPath(min);
+		markEdgeSetPath(min);
 	}
 
 	private HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
@@ -227,23 +227,15 @@ public class HyperGraph
 		}
 	}
 
-	private void markPath(EdgeSet set)
+	private void markEdgeSetPath(EdgeSet set)
 	{
 		if (set == null)
 		{
 			return;
 		}
 
-		for (HyperEdge edge : set)
-		{
-			edge.visited = true;
-			for(Node node: edge.tail){
-				node.visited = true;
-			}
-		}
-
-		markPath(set.getParent());
-		end.visited = true;
+		markHashPath(set.edges());
+		markEdgeSetPath(set.getParent());
 
 	}
 
@@ -584,9 +576,9 @@ public class HyperGraph
 		return neighbour;
 	}
 
-	private void markPath(HashSet<HyperEdge> set)
+	private void markHashPath(HashSet<HyperEdge> set)
 	{
-		end.visited = true;
+		
 		for (HyperEdge edge : set)
 		{
 			edge.visited = true;
@@ -697,7 +689,8 @@ public class HyperGraph
 		}
 
 		resetGraph();
-		markPath(minPath);
+		end.visited = true;
+		markHashPath(minPath);
 		System.out.println(minDistance);
 		System.out.println((double) (System.currentTimeMillis() - startingTime)
 				/ 1000 + " segundos ");

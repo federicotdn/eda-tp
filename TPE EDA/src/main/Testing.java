@@ -9,11 +9,13 @@ public class Testing
 	{
 		//Metodo main de paquete Main - keep it clean
 		
-		HyperGraph g = GraphLoader.loadGraph("H.hg");
+		HyperGraph g = GraphLoader.loadGraph("aproximado1.hg");
 		
 		//for (int i = 0; i < 4; i++)
-			g.minimumPathApprox();
+			g.minimumPathApproxAlt2(30);
 		//g.minimumPathExact();
+			g.resetGraph();
+			//g.minimumPathApproxAlt(10);
 		
 //		HyperGraph A = GraphLoader.loadGraph("A.hg");
 //		HyperGraph B = GraphLoader.loadGraph("B.hg");
