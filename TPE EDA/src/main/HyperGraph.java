@@ -69,10 +69,8 @@ public class HyperGraph
 
 	// ----------------Algoritmo Exacto---------------------------------------
 
-	public void minimumPathExact()
+	public double minimumPathExact()
 	{
-		System.out.println("Comenzando busqueda de camino minimo (exacto) en "
-				+ name + " ...");
 		long lastTime = System.currentTimeMillis();
 
 		EdgeSet min = null;
@@ -88,13 +86,10 @@ public class HyperGraph
 
 		}
 
-		System.out.println("Camino minimo pesa: " + min.getTotalWeight());
-
-		System.out.println("Tardo: "
-				+ ((double) System.currentTimeMillis() - lastTime) / 1000
-				+ " segundos.");
-
 		markEdgeSetPath(min);
+		
+		return min.getTotalWeight();
+		
 	}
 
 	private HashMap<Integer, EdgeSet> visited = new HashMap<Integer, EdgeSet>();
@@ -300,7 +295,7 @@ public class HyperGraph
 		return hEdge;
 	}
 
-	public void minimumPathApprox(int maxTimeSeg)
+	public double minimumPathApproxAlt2(int maxTimeSeg)
 	{
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
@@ -312,6 +307,8 @@ public class HyperGraph
 		improvePath(edge);
 
 		clearNodeMarks();
+		
+		return minDistance;
 
 	}
 
@@ -375,7 +372,6 @@ public class HyperGraph
 			{
 				minDistance = result.path.distance();
 				minPath = result.path.getPath();
-				System.out.println(result.path.distance());
 				current = minPath;
 			}
 
@@ -391,9 +387,7 @@ public class HyperGraph
 
 		}
 
-		System.out.println(minDistance);
-		System.out.println((double) (System.currentTimeMillis() - startingTime)
-				/ 1000 + " segundos ");
+		
 	}
 
 	private void procesHEdge(HyperEdge hEdge, PriorityQueue<HyperEdge> hq)
@@ -465,7 +459,6 @@ public class HyperGraph
 	{
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
-		long lastTime = 0;
 
 		HyperEdge edge = bestFirstSearch(start, end);
 		HyperEdge result = null;
@@ -506,7 +499,6 @@ public class HyperGraph
 			if (result != null && (result.path.distance() < minDistance))
 			{
 				minDistance = result.path.distance();
-				System.out.println("Encontre resultado menor: " + minDistance);
 				minPath = result.path.getPath();
 				it = minPath.iterator();
 				current = minPath;
@@ -518,12 +510,7 @@ public class HyperGraph
 
 			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
 
-			if (thisTime != lastTime && thisTime % 5 == 0)
-			{
-				System.out.println("Tiempo: " + thisTime + " s");
-				lastTime = thisTime;
-			}
-
+			
 			if (count >= current.size())
 			{
 				for (HyperEdge taboo : recentTaboos)
@@ -537,13 +524,7 @@ public class HyperGraph
 
 		}
 
-		System.out.println(minDistance);
-		System.out.println((double) (System.currentTimeMillis() - startingTime)
-				/ 1000 + " segundos ");
-		for (HyperEdge taboo : recentTaboos)
-		{
-			taboo.isTaboo = false;
-		}
+		
 		resetGraph();
 
 	}
@@ -590,7 +571,7 @@ public class HyperGraph
 	}
 
 
-	public void minimumPathApproxAlt2(int maxTimeSeg)
+	public double minimumPathApprox(int maxTimeSeg)
 	{
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
@@ -657,11 +638,9 @@ public class HyperGraph
 			if (result != null && (result.path.distance() < minDistance))
 			{
 				minDistance = result.path.distance();
-				System.out.println("Encontre resultado menor: " + minDistance);
 				minPath = result.path.getPath();
 				it = minPath.iterator();
 				current = minPath;
-				System.out.println(numberOfTaboos);
 				numberOfTaboos = 1;
 
 			} else
@@ -681,7 +660,6 @@ public class HyperGraph
 				}
 				recentTaboos = new HashSet<HyperEdge>();
 				count = 0;
-				System.out.println("aca");
 
 			}
 			count++;
@@ -691,9 +669,11 @@ public class HyperGraph
 		resetGraph();
 		end.visited = true;
 		markHashPath(minPath);
-		System.out.println(minDistance);
-		System.out.println((double) (System.currentTimeMillis() - startingTime)
-				/ 1000 + " segundos ");
+//		System.out.println(minDistance);
+//		System.out.println((double) (System.currentTimeMillis() - startingTime)
+//				/ 1000 + " segundos ");
+		
+		return minDistance;
 
 	}
 
