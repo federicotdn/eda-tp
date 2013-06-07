@@ -9,11 +9,22 @@ import main.HyperGraph;
 import main.algorithms.MinimumPathApproxAlgorithm;
 import main.algorithms.MinimumPathExactAlgorithm;
 
+/**
+ * La clase GraphSolver compone el front end del proyecto. 
+ *
+ */
 public class GraphSolver
 {
 	static final String exactArg = "exact";
 	static final String approxArg = "approx";
 	
+	/**
+	 * 
+	 * Metodo <code>main</code> del proyecto.  Éste metodo recibe los argumentos especificados por el usuario,
+	 * e invoca a la funcion correspondiente, luego de cargar el grafo.
+	 * 
+	 * @param args - Parametros enviados via linea de comandos.
+	 */
 	public static void main(String[] args)
 	{
 		if (args.length < 2 || args.length > 3)
@@ -47,7 +58,8 @@ public class GraphSolver
 		{
 			System.out.println("Calculando...");
 			
-			//LLamar al algoritmo exacto
+			//Se llama al algoritmo exacto, y se imprime el peso del camino.
+			
 			double result = MinimumPathExactAlgorithm.execute(graph);
 			System.out.println("El camino minimo pesa: " + result);
 		}
@@ -62,7 +74,8 @@ public class GraphSolver
 			try
 			{
 				int seconds = Integer.valueOf(args[2]);
-				//LLamar al algoritmo aproximado
+				
+				//Se llama al algoritmo aproximado, y se imprime el paso del camino creado.
 				
 				System.out.println("Calculando...");
 				double result = MinimumPathApproxAlgorithm.execute(graph, seconds);
