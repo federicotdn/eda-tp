@@ -95,7 +95,8 @@ public class GraphSolver
 				System.out.println("Error: \"" + args[2] + "\" no es una cantidad de segundos valida.");
 				return;
 			}
-			catch (InvalidTimeException e) {
+			catch (InvalidTimeException e) 
+			{
 				System.out.println(e.getMessage());
 				return;
 			}

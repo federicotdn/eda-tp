@@ -8,8 +8,21 @@ import java.util.LinkedList;
 import main.HyperGraph.HyperEdge;
 import main.HyperGraph.Node;
 
+/**
+ * La clase de GraphSaver esta compuesta por metodos estaticos, que permiten guardar grafos en distintos formatos.
+ *
+ */
 public class GraphSaver
 {
+	/**
+	 * El unico metodo publico de la clase recibe como parametro un objeto HyperGraph, y llama a las tres funciones
+	 * restantes de la clase.  De esta forma se crean tres archivos: subgrafo en .hg, grafo entero en .dot, y grafo con camino
+	 * en .dot.
+	 * 
+	 * 
+	 * @param graph - Grafo a guardar.
+	 * @throws IOException Si hay un error al crear el archivo.
+	 */
 	public static void createGraphFiles(HyperGraph graph) throws IOException
 	{
 		toDOT(graph);
@@ -17,6 +30,12 @@ public class GraphSaver
 		toHGpathOnly(graph);
 	}
 	
+	/**
+	 * Éste metodo recibe un objeto HyperGraph como parametro, y guarda el mismo en formato .dot.
+	 * 
+	 * @param hGraph - Grafo a guardar.
+	 * @throws IOException IOException Si hay un error al crear el archivo.
+	 */
 	private static void toDOT(HyperGraph hGraph) throws IOException
 	{
 
@@ -56,6 +75,13 @@ public class GraphSaver
 		System.out.println("Archivo creado: " + hGraph.name + ".dot");
 	}
 	
+	/**
+	 * 
+	 * Éste metodo recibe un objeto HyperGraph, y guarda el camino recorrido como un subgrafo separado en formato .hg.
+	 * 
+	 * @param graph - Grafo a extraer el subgrafo.
+	 * @throws IOException IOException Si hay un error al crear el archivo.
+	 */
 	private static void toHGpathOnly(HyperGraph graph) throws IOException
 	{
 		FileWriter fileOutput = new FileWriter(graph.name + ".min.hg");
@@ -114,6 +140,13 @@ public class GraphSaver
 		writer.close();
 	}
 	
+	/**
+	 * Éste metodo recibe un objeto de tipo HyperGraph, y guarda el mismo en formato .dot, pero con el camino recorrido
+	 * marcado en rojo (ejes y nodos).
+	 * 
+	 * @param hGraph - Grafo a guardar.
+	 * @throws IOException Si hay un error al crear el archivo.
+	 */
 	private static void toDOTwithPath(HyperGraph hGraph) throws IOException
 	{
 
