@@ -237,9 +237,13 @@ public class HyperGraph
 		for (HyperEdge edge : set)
 		{
 			edge.visited = true;
+			for(Node node: edge.tail){
+				node.visited = true;
+			}
 		}
 
 		markPath(set.getParent());
+		end.visited = true;
 
 	}
 
@@ -357,35 +361,21 @@ public class HyperGraph
 		HashSet<HyperEdge> previous = null;
 		HashSet<HyperEdge> taboo = new HashSet<HyperEdge>();
 
-		int i = 0;
-
 		while ((System.currentTimeMillis() - startingTime) < maxTime)
 		{
-
-			if (i == 1000)
-			{
-				taboo = new HashSet<HyperEdge>();
-			}
 
 			if (current != null)
 			{
 				previous = current;
 				edge = pickRandomEdge(current);
-				while (taboo.contains(edge))
-				{
-					edge = pickRandomEdge(current);
-				}
+
 			} else
 			{
 				edge = pickRandomEdge(previous);
-				while (taboo.contains(edge))
-				{
-					edge = pickRandomEdge(previous);
-				}
+
 			}
 
 			edge.isTaboo = true;
-			taboo.add(edge);
 			resetGraph();
 
 			result = bestFirstSearch(start, end);
@@ -550,7 +540,6 @@ public class HyperGraph
 				}
 				recentTaboos = new HashSet<HyperEdge>();
 				count = 0;
-				System.out.println("aca");
 
 			}
 
@@ -579,15 +568,15 @@ public class HyperGraph
 		while (result == null
 				&& (System.currentTimeMillis() - startingTime) < maxTime)
 		{
-			edge = pickRandomEdge(neighbour);
+			edge = pickRandomEdge(current);
 			edge.isTaboo = true;
 			result = bestFirstSearch(start, end);
 			edge.isTaboo = false;
+
 			if (result != null)
 			{
 				neighbour = result.path.getPath();
 			}
-			// System.out.println(neighbour);
 
 			resetGraph();
 
@@ -597,20 +586,22 @@ public class HyperGraph
 
 	private void markPath(HashSet<HyperEdge> set)
 	{
+		end.visited = true;
 		for (HyperEdge edge : set)
 		{
 			edge.visited = true;
+			for(Node node: edge.tail){
+				node.visited = true;
+			}
 		}
 
 	}
-	
-	HashMap<HashSet<HyperEdge>, Integer> map = new HashMap<HashSet<HyperEdge>, Integer>();
+
 
 	public void minimumPathApproxAlt2(int maxTimeSeg)
 	{
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
-		long lastTime = 0;
 
 		HyperEdge edge = bestFirstSearch(start, end);
 		HyperEdge result = null;
@@ -623,12 +614,19 @@ public class HyperGraph
 		int i = 0;
 
 		int count = 0;
+		int maxC = 0;
 
 		this.minDistance = edge.path.distance();
 		this.minPath = edge.path.getPath();
 		current = minPath;
 
-		// resetGraph();
+		for (HyperEdge e : hEdges)
+		{
+			maxC += e.head.size();
+		}
+		for(Node node: nodes){
+			maxC += node.head.size();
+		}
 
 		Iterator<HyperEdge> it = minPath.iterator();
 
@@ -642,14 +640,6 @@ public class HyperGraph
 					current = pickRandomNeighbour(current);
 					it = current.iterator();
 					numberOfTaboos = 1;
-					//System.out.println("aca");
-					if(!map.containsKey(current)){
-						map.put(current, 1);
-					}
-					else{
-						map.put(current, map.get(current) +1 );
-						
-					}
 
 				} else
 				{
@@ -690,15 +680,8 @@ public class HyperGraph
 				}
 			}
 
-			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
 
-			if (thisTime != lastTime && thisTime % 5 == 0)
-			{
-				System.out.println("Tiempo: " + thisTime + " s");
-				lastTime = thisTime;
-			}
-
-			if (count >= hEdges.size())
+			if (count >= maxC)
 			{
 				for (HyperEdge taboo : recentTaboos)
 				{
@@ -713,26 +696,11 @@ public class HyperGraph
 
 		}
 
+		resetGraph();
+		markPath(minPath);
 		System.out.println(minDistance);
 		System.out.println((double) (System.currentTimeMillis() - startingTime)
 				/ 1000 + " segundos ");
-		
-		for (HyperEdge taboo : recentTaboos)
-		{
-			taboo.isTaboo = false;
-		}
-		resetGraph();
-		
-		System.out.println(map);
-		int max = 0;
-		for(Integer cont: map.values()){
-			if(cont > max){
-				max = cont;
-			}
-		}
-		System.out.println(max);
-		
-
 
 	}
 
@@ -917,12 +885,14 @@ public class HyperGraph
 		{
 			return "[" + name + ", " + weight + "]";
 		}
-		
-		public void setAsBottom(){
+
+		public void setAsBottom()
+		{
 			isBottom = true;
 		}
-		
-		public boolean getVisited(){
+
+		public boolean getVisited()
+		{
 			return visited;
 		}
 	}
