@@ -803,7 +803,7 @@ public class HyperGraph
 		@Override
 		public int hashCode()
 		{
-			return name.hashCode();
+			return super.hashCode();
 		}
 
 		@Override

@@ -14,6 +14,10 @@ import main.HyperGraph.HyperEdge;
 import main.HyperGraph.Node;
 import main.InvalidTimeException;
 
+/**
+ * La clase estatica <code>MinimumPathApproxAlgorithm</code> contiene todas las funciones necesarias para poder
+ * buscar un camino minimo aproximado en un hipergrafo, en una cierta cantidad de tiempo definida.
+ */
 public class MinimumPathApproxAlgorithm
 {
 	private static HyperGraph graph;
@@ -26,6 +30,16 @@ public class MinimumPathApproxAlgorithm
 
 	private static long maxTime;
 
+	/**
+	 * 
+	 * El metodo <code>execute</code> es el unico metodo publico de la clase, que es usado por el front-end 
+	 * para realizar un calculo de camino minimo sobre un grafo.
+	 * 
+	 * @param hyperGraph - Hipergrafo donde se busacara un camino minimo.
+	 * @param maxTimeSeg - Tiempo maximo en segundos en la que el algoritmo puede correr.
+	 * @return Peso del camino calculado.  Los ejes y nodos del camino quedan con <code>visited = true</code>.
+	 * @throws InvalidTimeException si el tiempo especificado es invalido.
+	 */
 	public static double execute(HyperGraph hyperGraph, int maxTimeSeg)
 			throws InvalidTimeException
 	{
@@ -45,9 +59,9 @@ public class MinimumPathApproxAlgorithm
 
 		if (firstResult == null)
 		{
-			throw new InvalidTimeException(
-					"El intervalo de tiempo es demasiado chico");
+			throw new InvalidTimeException("El intervalo de tiempo es demasiado chico");
 		}
+		
 		getBetterMinPath();
 		graph.end.visited = true;
 		markPath(minPath);
@@ -130,12 +144,6 @@ public class MinimumPathApproxAlgorithm
 			pathCount++;
 
 		}
-
-		// System.out.println(minDistance);
-		// System.out.println((double) (System.currentTimeMillis() -
-		// startingTime)
-		// / 1000 + " segundos ");
-
 	}
 
 	private static void removeTaboo(Collection<HyperEdge> c)
@@ -288,7 +296,7 @@ public class MinimumPathApproxAlgorithm
 		HyperEdge edge;
 
 		resetGraph();
-		int i = 0;
+
 		while (result == null
 				&& (System.currentTimeMillis() - startingTime) < maxTime)
 		{
@@ -320,146 +328,7 @@ public class MinimumPathApproxAlgorithm
 			}
 		}
 
-	}
-
-	// NO VA
-
-	public static double minimumPathApproxAlt2(int maxTimeSeg)
-	{
-		maxTime = maxTimeSeg * 1000;
-		startingTime = System.currentTimeMillis();
-
-		HyperEdge edge = bestFirstSearch();
-		minWeight = edge.edgePath.totalWeight;
-		minPath = edge.edgePath.path;
-
-		improvePath(edge);
-
-		resetGraph();
-
-		return minWeight;
-
-	}
-
-	public static double minimumPathApproxAlt(int maxTimeSeg)
-	{
-		maxTime = maxTimeSeg * 1000;
-		startingTime = System.currentTimeMillis();
-
-		HyperEdge edge = bestFirstSearch();
-		HyperEdge result = null;
-
-		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
-		HashSet<HyperEdge> current;
-
-		int count = 0;
-
-		minWeight = edge.edgePath.totalWeight;
-		minPath = edge.edgePath.path;
-		current = minPath;
-
-		// resetGraph();
-
-		Iterator<HyperEdge> it = minPath.iterator();
-
-		while ((System.currentTimeMillis() - startingTime) < maxTime)
-		{
-			if (!it.hasNext())
-			{
-				for (HyperEdge taboo : recentTaboos)
-				{
-					taboo.isTaboo = false;
-				}
-				recentTaboos = new HashSet<HyperEdge>();
-				current = pickNeighbour(current);
-				it = current.iterator();
-
-			}
-
-			edge = it.next();
-			edge.isTaboo = true;
-			recentTaboos.add(edge);
-			resetGraph();
-			result = bestFirstSearch();
-
-			if (result != null && (result.edgePath.totalWeight < minWeight))
-			{
-				minWeight = result.edgePath.totalWeight;
-				minPath = result.edgePath.path;
-				it = minPath.iterator();
-				current = minPath;
-
-			} else
-			{
-				edge.isTaboo = false;
-			}
-
-			long thisTime = (System.currentTimeMillis() - startingTime) / 1000;
-
-			if (count >= current.size())
-			{
-				for (HyperEdge taboo : recentTaboos)
-				{
-					taboo.isTaboo = false;
-				}
-				recentTaboos = new HashSet<HyperEdge>();
-				count = 0;
-
-			}
-
-		}
-
-		resetGraph();
-
-		return minWeight;
-	}
-
-	private static void improvePath(HyperEdge last)
-	{
-		HyperEdge edge;
-		HyperEdge result = null;
-		HashSet<HyperEdge> current = last.edgePath.path;
-		HashSet<HyperEdge> previous = null;
-		HashSet<HyperEdge> taboo = new HashSet<HyperEdge>();
-
-		while ((System.currentTimeMillis() - startingTime) < maxTime)
-		{
-
-			if (current != null)
-			{
-				previous = current;
-				edge = pickRandomEdge(current);
-
-			} else
-			{
-				edge = pickRandomEdge(previous);
-
-			}
-
-			edge.isTaboo = true;
-			resetGraph();
-
-			result = bestFirstSearch();
-			if (result != null && (result.edgePath.totalWeight < minWeight))
-			{
-				minWeight = result.edgePath.totalWeight;
-				minPath = result.edgePath.path;
-				current = minPath;
-			}
-
-			edge.isTaboo = false;
-
-			if (result == null)
-			{
-				current = null;
-			} else
-			{
-				current = result.edgePath.path;
-			}
-
-		}
-
-	}
+	}	
 
 	public static void addParentToChildren(HyperEdge edge)
 	{
