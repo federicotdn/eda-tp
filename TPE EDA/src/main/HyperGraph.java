@@ -18,15 +18,15 @@ public class HyperGraph
 {
 	public String name;
 
-	private Node start;
-	private Node end;
+	public Node start;
+	public Node end;
 
-	private List<HyperEdge> hEdges;
-	private List<Node> nodes;
+	public List<HyperEdge> hEdges;
+	public List<Node> nodes;
 
-	private double minDistance;
+	public double minDistance;
 
-	private HashSet<HyperEdge> minPath;
+	public HashSet<HyperEdge> minPath;
 
 	private long startingTime;
 
@@ -71,8 +71,6 @@ public class HyperGraph
 
 	public double minimumPathExact()
 	{
-		long lastTime = System.currentTimeMillis();
-
 		EdgeSet min = null;
 
 		for (HyperEdge edge : end.tail)
@@ -455,7 +453,7 @@ public class HyperGraph
 
 	}
 
-	public void minimumPathApproxAlt(int maxTimeSeg)
+	public double minimumPathApproxAlt(int maxTimeSeg)
 	{
 		maxTime = maxTimeSeg * 1000;
 		startingTime = System.currentTimeMillis();
@@ -526,6 +524,8 @@ public class HyperGraph
 
 		
 		resetGraph();
+		
+		return minDistance;
 
 	}
 
@@ -679,16 +679,16 @@ public class HyperGraph
 
 	// ----------------Algoritmo Aproximado-End--------------------------------
 
-	protected static class Node
+	public static class Node
 	{
-		private ArrayList<HyperEdge> head; // Las dos listas son necesarias?
-		private ArrayList<HyperEdge> tail;
+		public ArrayList<HyperEdge> head; // Las dos listas son necesarias?
+		public ArrayList<HyperEdge> tail;
 
 		public String name;
 
 		public int tempParentCount;
 
-		private boolean visited;
+		public boolean visited;
 
 		public ArrayList<HyperEdge> tail()
 		{
@@ -759,22 +759,22 @@ public class HyperGraph
 		return false;
 	}
 
-	protected static class HyperEdge
+	public static class HyperEdge
 	{
-		private ArrayList<Node> head; // Las dos listas son necesarias?
-		private ArrayList<Node> tail;
-		private ArrayList<HyperEdge> parents;
+		public ArrayList<Node> head; // Las dos listas son necesarias?
+		public ArrayList<Node> tail;
+		public ArrayList<HyperEdge> parents;
 
 		public String name;
-		private final double weight;
+		public final double weight;
 
-		private EdgePath path;
-		private boolean visited;
+		public EdgePath path;
+		public boolean visited;
 		public int currentEntriesCount;
-		private boolean isTaboo;
+		public boolean isTaboo;
 
-		private boolean isTop;
-		private boolean isBottom;
+		public boolean isTop;
+		public boolean isBottom;
 
 		public HyperEdge(String name, double weight)
 		{
