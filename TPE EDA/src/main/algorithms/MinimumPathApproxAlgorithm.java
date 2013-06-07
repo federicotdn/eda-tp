@@ -1,5 +1,7 @@
 package main.algorithms;
 
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -8,6 +10,8 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import javax.naming.TimeLimitExceededException;
+
+import org.omg.Dynamic.Parameter;
 
 import main.HyperGraph;
 import main.HyperGraph.HyperEdge;
@@ -73,7 +77,7 @@ public class MinimumPathApproxAlgorithm
 	}
 
 	/**
-	 * 
+	 * Método que busca mejorar el primer camino encontrado.
 	 * 
 	 */
 	private static void getBetterMinPath()
@@ -82,14 +86,17 @@ public class MinimumPathApproxAlgorithm
 		HyperEdge result = null;
 		HyperEdge edge;
 
+		//Elementos prohíbidos temporalmente
 		HashSet<HyperEdge> recentTaboos = new HashSet<HyperEdge>();
 		HashSet<HyperEdge> current;
 
 		ArrayList<HyperEdge> taboos;
-
+		
+		//representa la cantidad de ejes que se prohíben simultáneamente
 		int numberOfTaboos = 1;
 		int i = 0;
 		int pathCount = 0;
+		//Representa cada caunto se reinicia recentTaboos
 		int maxPaths = maxNumberOfPaths();
 
 		current = minPath;
@@ -102,6 +109,9 @@ public class MinimumPathApproxAlgorithm
 			
 			if (!it.hasNext())
 			{
+				/*Si la cantidad de ejes que se marcan simultaneamente es igual a la cantidad de ejes del camino, se
+				 * se mueve a un vecino.
+				*/
 				if (numberOfTaboos >= current.size())
 				{
 					current = pickNeighbour(current);
@@ -115,6 +125,7 @@ public class MinimumPathApproxAlgorithm
 				it = current.iterator();
 			}
 
+			//Se prohíben la cantidad de ejes que corresponde
 			i = 0;
 			while (it.hasNext() && i < numberOfTaboos)
 			{
@@ -128,6 +139,7 @@ public class MinimumPathApproxAlgorithm
 			resetGraph();
 			result = bestFirstSearch();
 
+			//Si el resultado acutal es mejor, se elije como camino mínimo
 			if (result != null && (result.edgePath.totalWeight < minWeight))
 			{
 				minWeight = result.edgePath.totalWeight;
@@ -141,6 +153,7 @@ public class MinimumPathApproxAlgorithm
 				removeTaboo(taboos);
 			}
 
+			//si es necesario se reinicia recentTaboos
 			if (pathCount >= maxPaths)
 			{
 				removeTaboo(recentTaboos);
@@ -226,6 +239,11 @@ public class MinimumPathApproxAlgorithm
 		return null;
 	}
 
+	/**
+	 * Elije un eje al azar
+	 * @param set - combinación de ejes representando el camino
+	 * @return un HyperEdge
+	 */
 	private static HyperEdge pickRandomEdge(HashSet<HyperEdge> set)
 	{
 		int rand = (int) (Math.random() * set.size());
@@ -240,6 +258,9 @@ public class MinimumPathApproxAlgorithm
 		return edge;
 	}
 
+	/**
+	 * Reinicia las variables que de los nodos y aristas que sean necesarios.
+	 */
 	private static void resetGraph()
 	{
 		graph.clearNodeMarks();
@@ -294,7 +315,10 @@ public class MinimumPathApproxAlgorithm
 	/**
 	 * El metodo <code>removeUnnecesaryParents</code> se encarga de que un eje listo para agregar a la cola de prioridades
 	 * no tenga ejes <code>parent</code> innecesarios.  Se remueven todos las referencias a ejes <code>parent</code> posibles,
-	 * asegurandose de que cada nodo padre de hEdge esté siendo habilitado por algun eje padre.
+	 * asegurandose de que cada nodo padre de hEdge esté siendo habilitado por algun eje padre. El método consiste en en ir
+	 * sacando temporalmente de a uno los padres y con la variable tempParentCount ir contando los padres que tiene sin contar
+	 * al que se sacó. De esta manera, si un padre es indispensable y debe estar en la lista de padres para satisfacer a un nodo
+	 * tempParentCount es = 0
 	 * 
 	 * @param hEdge - Eje a procesar para remover padres innecesarios.
 	 */
@@ -333,7 +357,11 @@ public class MinimumPathApproxAlgorithm
 		it = hEdge.parents.iterator();
 
 	}
-
+	/**
+	 * Elije un eje del camino actual al azar y lo marca como taboo para que <b> bestFirstSearch() <b> busque un vecino 
+	 * @param current - set actual de HyperEdge
+	 * @return un vecino
+	 */
 	private static HashSet<HyperEdge> pickNeighbour(HashSet<HyperEdge> current)
 	{
 
@@ -343,6 +371,7 @@ public class MinimumPathApproxAlgorithm
 
 		resetGraph();
 
+		//Si result es null quiere decir que prohibiendo a ese eje no se puede encontrar un camino que llegue al destino.
 		while (result == null
 				&& (System.currentTimeMillis() - startingTime) < maxTime)
 		{
@@ -429,6 +458,11 @@ public class MinimumPathApproxAlgorithm
 		return false;
 	}
 
+	/**
+	 * Se determinó utilizar éste número ya que está relacionado con el número de caminos. Se determinó experimentalmente. 
+	 * No se utilizó el número total de caminos debido a la complejidad del cálculo.
+	 * @return un número máximo de caminos que se van utilizar antes de reiniciar los taboos recientes.
+	 */
 	private static int maxNumberOfPaths()
 	{
 		int maxPaths = 0;

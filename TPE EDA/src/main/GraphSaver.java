@@ -77,7 +77,9 @@ public class GraphSaver
 	
 	/**
 	 * 
-	 * Éste metodo recibe un objeto HyperGraph, y guarda el camino recorrido como un subgrafo separado en formato .hg.
+	 * Éste metodo recibe un objeto HyperGraph, y guarda el camino recorrido apartado como un subgrafo separado en formato .hg.
+	 * 
+	 * <p>Se consideran hiperejes y nodos como parte del camino si tienen <code>visited = true</code>.
 	 * 
 	 * @param graph - Grafo a extraer el subgrafo.
 	 * @throws IOException IOException Si hay un error al crear el archivo.
@@ -143,6 +145,8 @@ public class GraphSaver
 	/**
 	 * Éste metodo recibe un objeto de tipo HyperGraph, y guarda el mismo en formato .dot, pero con el camino recorrido
 	 * marcado en rojo (ejes y nodos).
+	 * 
+	 * <p>Se consideran hiperejes y nodos como parte del camino si tienen <code>visited = true</code>.
 	 * 
 	 * @param hGraph - Grafo a guardar.
 	 * @throws IOException Si hay un error al crear el archivo.
