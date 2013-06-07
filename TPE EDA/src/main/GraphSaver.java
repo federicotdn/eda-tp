@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import main.HyperGraph.HyperEdge;
 import main.HyperGraph.Node;
@@ -47,6 +48,70 @@ public class GraphSaver
 		writer.write("}");
 		writer.close();
 		System.out.println("Archivo creado: " + hGraph.name + ".dot");
+	}
+	
+	public static void toHGpathOnly(HyperGraph graph) throws IOException
+	{
+		FileWriter fileOutput = new FileWriter(graph.name + ".hg");
+		BufferedWriter writer = new BufferedWriter(fileOutput);
+		
+		writer.write("# Subgrafo de: " + graph.name);
+		writer.newLine();
+		
+		writer.write(graph.start().name);
+		writer.newLine();
+		
+		writer.write(graph.end().name);
+		writer.newLine();
+
+		
+		for (HyperEdge edge : graph.edges())
+		{		
+			if (edge.visited)
+			{
+				StringBuffer line = new StringBuffer();
+				
+				line.append(edge.name + " " + edge.weight() + " ");
+				line.append(edge.head().size());
+				
+				for (Node node : edge.head())
+					if (node.visited)
+					line.append(node.name + " ");
+				
+				line.append(" " + edge.tail().size());
+				
+			}
+		}
+		
+		for (HyperEdge edge : graph.edges())
+		{
+			StringBuffer line = new StringBuffer();
+			
+			line.append(edge.name + " " + edge.weight() + " ");
+			line.append(edge.head().size() + " ");
+			
+			for (Node node : edge.head())
+				line.append(node.name + " ");
+			
+			int entryCount = edge.tail().size();
+			line.append(entryCount + " ");
+			
+			int nodeNumber = 1;
+			
+			for (Node node : edge.tail())
+			{
+				line.append(node.name);
+				
+				if (nodeNumber++ < entryCount)
+					line.append(" ");
+			}
+			
+			writer.write(line.toString());
+			
+		}
+		
+		System.out.println("Archivo: " + graph.name + ".hg creado.");
+		writer.close();
 	}
 	
 	public static void toDOTwithPath(HyperGraph hGraph) throws IOException

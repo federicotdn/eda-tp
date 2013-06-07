@@ -17,10 +17,11 @@ public class GraphSolver
 			printInstructions();
 		
 		String graphName = args[0];
+		HyperGraph graph = null;
 		
 		try
 		{
-			HyperGraph graph = GraphLoader.loadGraph(graphName);
+			graph = GraphLoader.loadGraph(graphName);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -38,8 +39,8 @@ public class GraphSolver
 		if (solveMode == exactArg)
 		{
 			//LLamar al algoritmo exacto
-			
-			
+			double result = graph.minimumPathExact();
+			System.out.println("El camino minimo pesa: " + result);
 		}
 		else if (solveMode == approxArg)
 		{
@@ -50,6 +51,9 @@ public class GraphSolver
 			{
 				int seconds = Integer.valueOf(args[2]);
 				//LLamar al algoritmo aproximado
+				
+				double result = graph.minimumPathApprox(seconds);
+				System.out.println("El camino minimo es (aproximadamente): " + result);
 				
 			}
 			catch(NumberFormatException e) 
