@@ -1,12 +1,13 @@
-package main;
+package main.utilities;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import main.HyperGraph.HyperEdge;
-import main.HyperGraph.Node;
+import main.structure.HyperGraph;
+import main.structure.HyperGraph.HyperEdge;
+import main.structure.HyperGraph.Node;
 
 /**
  * La clase de GraphSaver esta compuesta por metodos estaticos, que permiten guardar grafos en distintos formatos.

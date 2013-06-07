@@ -1,4 +1,4 @@
-package main;
+package main.utilities;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import main.HyperGraph.HyperEdge;
-import main.HyperGraph.Node;
+import main.structure.HyperGraph;
+import main.structure.HyperGraph.HyperEdge;
+import main.structure.HyperGraph.Node;
 
 /**
  * La clase <code>GraphLoader</code> es la clase encargada de cargar grafos a partir de archivos ".hg".

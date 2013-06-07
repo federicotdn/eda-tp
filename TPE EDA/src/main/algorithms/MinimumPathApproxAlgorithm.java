@@ -13,10 +13,10 @@ import javax.naming.TimeLimitExceededException;
 
 import org.omg.Dynamic.Parameter;
 
-import main.HyperGraph;
-import main.HyperGraph.HyperEdge;
-import main.HyperGraph.Node;
-import main.InvalidTimeException;
+import main.structure.HyperGraph;
+import main.structure.HyperGraph.HyperEdge;
+import main.structure.HyperGraph.Node;
+import main.utilities.InvalidTimeException;
 
 /**
  * La clase estatica <code>MinimumPathApproxAlgorithm</code> contiene todas las funciones necesarias para poder

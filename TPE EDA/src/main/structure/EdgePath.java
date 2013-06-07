@@ -1,9 +1,9 @@
-package main;
+package main.structure;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
-import main.HyperGraph.HyperEdge;
+import main.structure.HyperGraph.HyperEdge;
 
 /**
  * La clase EdgePath modela un camino conformado de ejes de tipo HyperEdge.

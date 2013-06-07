@@ -1,4 +1,4 @@
-package main;
+package main.utilities;
 
 /**
  * La clase InvaidTimeException es una clase de utilidad para ser usada en el algoritmo aproximado.

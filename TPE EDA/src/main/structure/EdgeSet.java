@@ -1,11 +1,11 @@
-package main;
+package main.structure;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import main.HyperGraph.HyperEdge;
-import main.HyperGraph.Node;
+import main.structure.HyperGraph.HyperEdge;
+import main.structure.HyperGraph.Node;
 
 /**
  * La clase EdgeSet modela un conjunto de ejes de un hipergrafo.  Se utiliza en el algoritmo exacto para manipular

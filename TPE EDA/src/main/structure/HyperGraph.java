@@ -1,4 +1,4 @@
-package main;
+package main.structure;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -138,7 +138,11 @@ public class HyperGraph
 			currentEntriesCount = 0;
 		}
 
-
+		/**
+		 * Metodo que genera una nueva instancia de path para el eje en caso de no tenerla previamente.  Tambien llama a 
+		 * <code>mergeWith</code> con el path de todos los hiperejes padre.  De esta forma, el eje ahora contiene en su
+		 * variable path una representacion de un camino valido hacia si mismo, incluyendo el peso de dicho camino.
+		 */
 		public void calculatePathDistance()
 		{
 			if (this.edgePath == null)

@@ -3,12 +3,12 @@ package front;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import main.GraphLoader;
-import main.GraphSaver;
-import main.HyperGraph;
-import main.InvalidTimeException;
 import main.algorithms.MinimumPathApproxAlgorithm;
 import main.algorithms.MinimumPathExactAlgorithm;
+import main.structure.HyperGraph;
+import main.utilities.GraphLoader;
+import main.utilities.GraphSaver;
+import main.utilities.InvalidTimeException;
 
 /**
  * La clase GraphSolver compone el front end del proyecto. 
